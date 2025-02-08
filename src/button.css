@@ -1,0 +1,67 @@
+.button {
+    background-color: #ffffff00; 
+    color: #000000; 
+    width: 9em;
+    height: 2.9em;
+    border: #000000 0.1em solid; 
+    border-radius: 11px; 
+    text-align: right; 
+    position: relative;
+    transition: all 0.6s ease; 
+  }
+  
+  .button:hover {
+    background-color: #000000; 
+    color: #fff; 
+    cursor: pointer; 
+  }
+  
+  .button svg {
+    width: 1.6em; 
+    margin-left: 0.5em; 
+    position: absolute;
+    display: flex;
+    transition: all 0.6s ease; 
+  }
+  
+  .button:hover svg {
+    transform: translateX(10px); 
+  }
+  
+  .text {
+    margin-right: 1em; 
+  }
+  
+/***********************************************/
+  .button1 {
+    background-color: #ffffff00;
+    color: #ffffff;
+    width: 9em;
+    height: 3em;
+    border: #ffffff 0.1em solid;
+    border-radius: 11px;
+    text-align: right;
+    transition: all 0.6s ease;
+}
+
+.button1:hover {
+    background-color: #ffffff33;
+    color: #fff;
+    cursor: pointer;
+}
+
+.button1 svg {
+    width: 1.6em;
+    margin-left: 0.5em;
+    position: absolute;
+    display: flex;
+    transition: all 0.6s ease;
+}
+
+.button1:hover svg {
+    transform: translateX(10px);
+}
+
+.text {
+    margin-right: 1em;
+}
