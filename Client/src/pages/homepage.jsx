@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import BookButton from '../components/bookButton';
 import 'swiper/swiper-bundle.css';
 
@@ -161,7 +163,7 @@ const HomePage = () => {
                     <ul className="text-left space-y-2 mb-2">
                       {service.features.map((feature, i) => (
                         <li key={i} className="flex items-center">
-                          <span className="text-green-500 mr-2">✔</span>
+                          <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span>
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -200,19 +202,19 @@ const HomePage = () => {
           <h2 className="text-3xl mt-8">We provide</h2>
           <ul className="text-lg mt-6 space-y-3">
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✔</span> One-off, weekly, or fortnightly visits
+              <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span> One-off, weekly, or fortnightly visits
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✔</span> All cleaning materials and equipment
+              <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span> All cleaning materials and equipment
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✔</span> 100% satisfaction guarantee
+              <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span> 100% satisfaction guarantee
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✔</span> Vetted & background-checked cleaners
+              <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span> Vetted & background-checked cleaners
             </li>
             <li className="flex items-start">
-              <span className="text-green-500 mr-2">✔</span> Online booking and payment
+              <span className="text-green-500 mr-2"><FontAwesomeIcon icon = {faCheckCircle} /></span> Online booking and payment
             </li>
           </ul>
           <Link to='/bookingPage'>
