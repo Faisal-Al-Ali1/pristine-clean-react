@@ -4,7 +4,7 @@ import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import BookButton from '../components/bookButton';
+import BookButton from '../bookButton';
 import 'swiper/swiper-bundle.css';
 
 

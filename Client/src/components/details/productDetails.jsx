@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import BookButton from '../components/bookButton';
+import BookButton from '../bookButton';
 
 const ProductDetails = () => {
   return (

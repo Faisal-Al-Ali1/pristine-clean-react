@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from './navbar';
-import Footer from './footer';
+import Navbar from './navbar/navbar';
+import Footer from './footer/footer';
 import { useLocation } from 'react-router-dom';
 
 const Layout = ({ children }) => {
