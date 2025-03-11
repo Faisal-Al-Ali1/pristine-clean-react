@@ -2,86 +2,96 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faPhoneAlt, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons';
-import { faTwitter, faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faTwitter, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 py-8">
+    <footer className="bg-gray-900 text-white py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-around gap-8">
+        {/* Main Footer Content */}
+        <div className="flex flex-col sm:flex-row justify-between gap-8">
           {/* Company Info */}
-          <div className="sm:w-1/3">
-            <h3 className="text-xl font-bold text-gray-900">Pristine Clean</h3>
-            <p className="mt-4 text-gray-600">
-              At Pristine Clean, we go beyond surface cleaning to deliver an unparalleled experience. Using
-              eco-friendly products and modern techniques, we provide a cleaner, healthier environment for you
-              to enjoy. Trust us to bring sparkle and care to every corner of your space, so you can focus on
-              what truly matters.
+          <div className="sm:w-1/4">
+            <div className="flex items-center mb-4">
+              <img src="../images/Logo2.png" alt="Pristine Clean Logo" className="h-8 w-auto mr-2" />
+            </div>
+            <p className="text-gray-400 text-sm mb-4">
+            Pristine Clean—where eco-friendly meets spotless perfection!
             </p>
-            <div className="flex justify-start space-x-4 mt-6">
-              {/* Social Media Icons */}
-              <a href="#" className="text-gray-700 hover:text-gray-900 text-lg">
-                    <FontAwesomeIcon icon={faTwitter} className="text-2xl" />
+            <div className="flex space-x-4 mb-6">
+              <a href="#" className="text-blue-400 hover:text-blue-300">
+                <FontAwesomeIcon icon={faTwitter} />
               </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 text-lg">
-                    <FontAwesomeIcon icon={faInstagram} className="text-2xl" />
+              <a href="#" className="text-blue-400 hover:text-blue-300">
+                <FontAwesomeIcon icon={faInstagram} />
               </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 text-lg">
-                    <FontAwesomeIcon icon={faFacebook} className="text-2xl" />
+              <a href="#" className="text-blue-400 hover:text-blue-300">
+                <FontAwesomeIcon icon={faYoutube} />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="text-center sm:w-1/3">
-            <h3 className="text-xl font-bold text-gray-900">Quick Links</h3>
-            <ul className="mt-4 space-y-4">
-              <li><Link to="/" className="text-gray-600 hover:text-gray-900">Home</Link></li>
-              <li><Link to="/services" className="text-gray-600 hover:text-gray-900">Services</Link></li>
-              <li><Link to="/aboutUs" className="text-gray-600 hover:text-gray-900">About Us</Link></li>
-              <li><Link to="/contactUs" className="text-gray-600 hover:text-gray-900">Contact Us</Link></li>
+          {/* Navigation */}
+          <div className="sm:w-1/5">
+            <h3 className="text-lg font-semibold mb-6">Navigation</h3>
+            <ul className="space-y-3">
+              <li><Link to="/" className="text-gray-400 hover:text-white">Home</Link></li>
+              <li><Link to="/services" className="text-gray-400 hover:text-white">Our Services</Link></li>
+              <li><Link to="/aboutUs" className="text-gray-400 hover:text-white">About Us</Link></li>
+              <li><Link to="/contactUs" className="text-gray-400 hover:text-white">Contact us</Link></li>
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div className="sm:w-1/5">
+            <h3 className="text-lg font-semibold mb-6">Services</h3>
+            <ul className="space-y-3">
+              <li><Link to="/services/residential" className="text-gray-400 hover:text-white">Residential Cleaning</Link></li>
+              <li><Link to="/services/office" className="text-gray-400 hover:text-white">Office Cleaning</Link></li>
+              <li><Link to="/services/moveInOut" className="text-gray-400 hover:text-white">Move In/Out Cleaning</Link></li>
+              <li><Link to="/services/car" className="text-gray-400 hover:text-white">Car Cleaning</Link></li>
+              <li><Link to="/services/renovation" className="text-gray-400 hover:text-white">After Renovation</Link></li>
+              <li><Link to="/services/deep" className="text-gray-400 hover:text-white">Deep Cleaning</Link></li>
             </ul>
           </div>
 
           {/* Contact Information */}
-          <div className="sm:w-1/3">
-            <h3 className="text-xl font-bold text-gray-900">Contact Information</h3>
-            <ul className="mt-4 space-y-6 text-gray-600">
-              {/* Address */}
+          <div className="sm:w-1/4">
+            <h3 className="text-lg font-semibold mb-6">Contact Information</h3>
+            <ul className="space-y-3 text-gray-400">
               <li className="flex items-center">
-              <FontAwesomeIcon icon={faMapMarkerAlt} className="text-gray-900 mr-4" />
+                <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2 text-blue-400" />
                 Zarqa, Jordan
               </li>
-              {/* Phone */}
               <li className="flex items-center">
-              <FontAwesomeIcon icon={faPhoneAlt} className="text-gray-900 mr-4" />
+                <FontAwesomeIcon icon={faPhoneAlt} className="mr-2 text-blue-400" />
                 +962-XXX-XXXX
               </li>
-              {/* Email */}
               <li className="flex items-center">
-              <FontAwesomeIcon icon={faEnvelope} className="text-gray-900 mr-4" />
+                <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-400" />
                 info@pristineclean.com
               </li>
-              {/* Working Hours */}
               <li className="flex items-center">
-              <FontAwesomeIcon icon={faClock} className="text-gray-900 mr-4" />
-                <div>
-                  <p>Sun - Thu: 8:00 AM - 5:00 PM</p>
-                  <p>Fri - Sat: 10:00 AM - 3:00 PM</p>
-                </div>
+                <FontAwesomeIcon icon={faClock} className="mr-2 text-blue-400" />
+                Sun - Thu: 8:00 Am - 5:00 Pm
+              </li>
+              <li className="flex items-center pl-6">
+                Fri - Sat: 10:00 Am - 3:00 Pm
               </li>
             </ul>
           </div>
-
         </div>
 
+        {/* Divider Line */}
+        <div className="border-t border-gray-700 my-8"></div>
+
         {/* Footer Bottom */}
-        <div className="mt-10 border-t pt-6 flex flex-col sm:flex-row justify-between text-sm text-gray-600">
-          <p className="text-center sm:text-left">&copy; Pristine Clean 2025. All Rights Reserved</p>
-          <div className="space-x-4 text-center sm:text-right mt-4 sm:mt-0">
-            <Link to="#" className="hover:underline">Terms of Use</Link>
-            <Link to="#" className="hover:underline">Cookie Policy</Link>
-            <Link to="#" className="hover:underline">Privacy Policy</Link>
+        <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-400">
+          <p>Copyright © 2025 Pristine Clean </p>
+          <div className="space-x-6 mt-4 sm:mt-0">
+            <Link to="/terms" className="hover:text-white">Terms of Use</Link>
+            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
           </div>
         </div>
       </div>

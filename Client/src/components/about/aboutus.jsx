@@ -1,27 +1,50 @@
 import React from 'react';
+import { Instagram, Twitter } from 'lucide-react';
 
 const AboutUs = () => {
+  // Team member data
+  const teamMembers = [
+    {
+      name: "Lina Farah",
+      role: "Operations Manager",
+      bio: "Lina oversees the daily operations at Pristine Clean, ensuring every client receives top-notch service. With over 8 years of experience in the cleaning industry.",
+      image: "../images/person2.jpeg"
+    },
+    {
+      name: "Omar Haddad",
+      role: "Senior Cleaning Specialist",
+      bio: "Omar is a seasoned professional with a keen eye for detail. He has been with Pristine Clean for 5 years, specializing in both residential and commercial cleaning.",
+      image: "../images/person3.jpeg"
+    },
+    {
+      name: "Dana Khalil",
+      role: "Client Relations Coordinator",
+      bio: "Dana is the friendly face behind all client interactions at Pristine Clean. Her role is to ensure seamless communication, manage bookings, and address client inquiries.",
+      image: "../images/person1.jpeg"
+    }
+  ];
+
   return (
     <div className="bg-gray-200">
       {/* Hero Section */}
       <div className="relative h-72">
-    <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-        backgroundImage:
-            "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/pexels-tima-miroshnichenko-6196238.jpg')",
-        backgroundPosition: 'center top 35%',
-        }}
-    ></div>
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/pexels-tima-miroshnichenko-6196238.jpg')",
+            backgroundPosition: 'center top 35%',
+          }}
+        ></div>
 
-    {/* Text content */}
-    <div className="absolute inset-0 flex flex-col justify-center items-center text-center">
-        <h1 className="text-white text-4xl font-bold">About Us</h1>
-        <p className="text-white text-lg mt-4">
-        Committed to Delivering a Cleaner, Healthier Environment for You.
-        </p>
-    </div>
-    </div>
+        {/* Text content */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center">
+          <h1 className="text-white text-4xl font-bold">About Us</h1>
+          <p className="text-white text-lg mt-4">
+            Committed to Delivering a Cleaner, Healthier Environment for You.
+          </p>
+        </div>
+      </div>
 
       {/* About Us Section */}
       <section className="bg-white py-16">
@@ -37,10 +60,10 @@ const AboutUs = () => {
                 ourselves to building trust with every client by treating their spaces as if they were our own.
               </p>
               <p className="mt-6 text-gray-600">
-                Over the years, we’ve grown into a trusted name in the cleaning industry, serving homes and businesses
+                Over the years, we've grown into a trusted name in the cleaning industry, serving homes and businesses
                 across Jordan. Our journey has been defined by a relentless focus on quality, innovation, and customer
                 satisfaction. From embracing eco-friendly cleaning solutions to introducing convenient online booking,
-                we’ve continuously evolved to meet the needs of our clients.
+                we've continuously evolved to meet the needs of our clients.
               </p>
             </div>
             <div>
@@ -81,59 +104,53 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Our Dedicated Team Section */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900">Our Dedicated Team</h2>
-            <p className="mt-4 text-lg text-gray-600">Meet some of the faces behind Pristine Clean</p>
+      {/* Improved Team Section */}
+      <section className="bg-gray-50 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section header with accent line */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center items-center mb-4">
+            <span className="h-0.5 w-12 bg-blue-500 mr-3"></span>
+            <span className="text-blue-600 uppercase text-sm font-semibold">OUR TEAM</span>
+            <span className="h-0.5 w-12 bg-blue-500 ml-3"></span>
           </div>
-          <div className="mt-10 flex flex-wrap justify-center gap-8">
-            {/* Team Member 1 */}
-            <div className="max-w-xs text-center">
-              <img
-                src="../images/person2.jpeg"
-                alt="Lina Farah"
-                className="mx-auto rounded-full h-32 w-32 object-cover"
-              />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Lina Farah</h3>
-              <p className="text-sm text-blue-600">Operations Manager</p>
-              <p className="mt-2 text-sm text-gray-600">
-                Lina oversees the daily operations at Pristine Clean, ensuring every client receives top-notch service.
-                With over 8 years of experience in the cleaning industry.
-              </p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+            Meet the Expert Team at Pristine Clean
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+            Our skilled professionals are committed to delivering exceptional cleaning services for your home or business
+          </p>
+        </div>
+
+        {/* Team members flex container */}
+        <div className="flex flex-wrap justify-center gap-8">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:transform hover:scale-105 flex-shrink-0 w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
+              <div className="relative">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-64 object-cover object-center"
+                />
+                <div className="absolute bottom-0 right-0 p-4 flex space-x-2">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transition-colors duration-300">
+                    <Instagram size={20} />
+                  </button>
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transition-colors duration-300">
+                    <Twitter size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
+                <p className="text-blue-600 font-medium mb-4">{member.role}</p>
+                <p className="text-gray-600">{member.bio}</p>
+              </div>
             </div>
-            {/* Team Member 2 */}
-            <div className="max-w-xs text-center">
-              <img
-                src="../images/person3.jpeg"
-                alt="Omar Haddad"
-                className="mx-auto rounded-full h-32 w-32 object-cover"
-              />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Omar Haddad</h3>
-              <p className="text-sm text-blue-600">Senior Cleaning Specialist</p>
-              <p className="mt-2 text-sm text-gray-600">
-                Omar is a seasoned professional with a keen eye for detail. He has been with Pristine Clean for 5 years,
-                specializing in both residential and commercial cleaning.
-              </p>
-            </div>
-            {/* Team Member 3 */}
-            <div className="max-w-xs text-center">
-              <img
-                src="../images/person1.jpeg"
-                alt="Dana Khalil"
-                className="mx-auto rounded-full h-32 w-32 object-cover"
-              />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Dana Khalil</h3>
-              <p className="text-sm text-blue-600">Client Relations Coordinator</p>
-              <p className="mt-2 text-sm text-gray-600">
-                Dana is the friendly face behind all client interactions at Pristine Clean. Her role is to ensure seamless
-                communication, manage bookings, and address client inquiries.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
+    </section>
     </div>
   );
 };
