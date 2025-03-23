@@ -8,7 +8,6 @@ import {
   FaBroom,
   FaHardHat,
   FaCar,
-  FaRedo,
   FaRegCalendar,
   FaRegClock,
 } from 'react-icons/fa';
@@ -48,56 +47,63 @@ const ServiceStep = ({ values, setFieldValue }) => {
   );
 };
 
-// Step 2: Date and Time Selection
-const DateTimeStep = ({ values, setFieldValue }) => {
-  return (
-    <div>
-      <h2 className="text-lg font-semibold mb-2">When Would You Like Us To Come?</h2>
-      <p className="text-sm text-gray-500 mb-4">Please choose a date and time that works for you.</p>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Cleaning date/time*</label>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative">
+// Step 2: Dynamic Fields Based on Service
+const DynamicFieldsStep = ({ values }) => {
+  switch (values.selectedService) {
+    case 'Residential Cleaning':
+      return (
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Residential Cleaning Details</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Number of Rooms*</label>
             <Field
-              type="date"
-              name="selectedDate"
-              className="block w-full rounded-md border border-gray-300 p-2 pl-10"
+              type="number"
+              name="numberOfRooms"
+              className="block w-full rounded-md border border-gray-300 p-2"
             />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-              <FaRegCalendar />
-            </div>
-          </div>
-          <div className="relative">
-            <Field
-              type="time"
-              name="selectedTime"
-              className="block w-full rounded-md border border-gray-300 p-2 pl-10"
-            />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-              <FaRegClock />
-            </div>
           </div>
         </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Duration*</label>
-        <div className="relative">
-          <Field
-            type="time"
-            name="selectedDuration"
-            className="block w-full rounded-md border border-gray-300 p-2 pl-10"
-          />
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-            <FaRegClock />
+      );
+    case 'Office Cleaning':
+      return (
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Office Cleaning Details</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Office Size (m²)*</label>
+            <Field
+              type="number"
+              name="officeSize"
+              className="block w-full rounded-md border border-gray-300 p-2"
+            />
           </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+    case 'Car Cleaning':
+      return (
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Car Cleaning Details</h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Car Type*</label>
+            <Field
+              as="select"
+              name="carType"
+              className="block w-full rounded-md border border-gray-300 p-2"
+            >
+              <option value="">Select</option>
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Truck">Truck</option>
+            </Field>
+          </div>
+        </div>
+      );
+    default:
+      return null;
+  }
 };
 
-// Step 3: Frequency Selection
-const FrequencyStep = ({ values, setFieldValue }) => {
+// Step 3: Common Fields
+const CommonFieldsStep = ({ values, setFieldValue }) => {
   const frequencies = [
     { name: 'Onetime', discount: 0 },
     { name: 'Weekly', discount: 5 },
@@ -107,91 +113,185 @@ const FrequencyStep = ({ values, setFieldValue }) => {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">How Often Should We Come?</h2>
-      <div className="grid grid-cols-4 gap-4">
-        {frequencies.map((frequency) => (
-          <button
-            key={frequency.name}
-            type="button"
-            className={`p-3 border rounded-lg text-center relative ${
-              values.selectedFrequency === frequency.name
-                ? 'border-blue-500 bg-blue-50 text-blue-600'
-                : 'border-gray-300'
-            }`}
-            onClick={() => setFieldValue('selectedFrequency', frequency.name)}
-          >
-            {frequency.name}
-            {frequency.discount > 0 && values.selectedFrequency === frequency.name && (
-              <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1">
-                Discount {frequency.discount}%
+      <h2 className="text-lg font-semibold mb-4">Common Details</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date*</label>
+          <Field
+            type="date"
+            name="selectedDate"
+            className="block w-full rounded-md border border-gray-300 p-2"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Time*</label>
+          <Field
+            type="time"
+            name="selectedTime"
+            className="block w-full rounded-md border border-gray-300 p-2"
+          />
+        </div>
+      </div>
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Frequency*</label>
+        <div className="grid grid-cols-4 gap-4">
+          {frequencies.map((frequency) => (
+            <button
+              key={frequency.name}
+              type="button"
+              className={`p-3 border rounded-lg text-center relative ${
+                values.selectedFrequency === frequency.name
+                  ? 'border-blue-500 bg-blue-50 text-blue-600'
+                  : 'border-gray-300'
+              }`}
+              onClick={() => setFieldValue('selectedFrequency', frequency.name)}
+            >
+              {frequency.name}
+              {frequency.discount > 0 && values.selectedFrequency === frequency.name && (
+                <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+                  Discount {frequency.discount}%
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Contact Information*</label>
+        <Field
+          type="text"
+          name="firstName"
+          placeholder="First Name"
+          className="block w-full rounded-md border border-gray-300 p-2"
+        />
+        <Field
+          type="text"
+          name="lastName"
+          placeholder="Last Name"
+          className="block w-full rounded-md border border-gray-300 p-2 mt-2"
+        />
+        <Field
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          className="block w-full rounded-md border border-gray-300 p-2 mt-2"
+        />
+      </div>
+    </div>
+  );
+};
+
+// Step 4: Payment
+const PaymentStep = ({ values, setFieldValue }) => {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-4">Fill your payment method</h2>
+      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        {/* Card Payment Section */}
+        <div className="mb-6">
+          <div className="flex items-center mb-4">
+            <Field
+              type="radio"
+              id="cardPayment"
+              name="paymentMethod"
+              value="card"
+              className="form-radio h-5 w-5 text-blue-600"
+            />
+            <label htmlFor="cardPayment" className="ml-2 text-gray-700">
+              Card
+            </label>
+          </div>
+          {values.paymentMethod === 'card' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Card Information</label>
+                <Field
+                  type="text"
+                  name="cardNumber"
+                  placeholder="1234 1234 1234 1234"
+                  className="block w-full rounded-md border border-gray-300 p-2"
+                />
               </div>
-            )}
-          </button>
-        ))}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">MM/YY</label>
+                  <Field
+                    type="text"
+                    name="cardExpiry"
+                    placeholder="MM/YY"
+                    className="block w-full rounded-md border border-gray-300 p-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CW</label>
+                  <Field
+                    type="text"
+                    name="cardCw"
+                    placeholder="CW"
+                    className="block w-full rounded-md border border-gray-300 p-2"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                <Field
+                  type="text"
+                  name="cardholderName"
+                  placeholder="Full name on card"
+                  className="block w-full rounded-md border border-gray-300 p-2"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Cash on Hand Section */}
+        <div className="flex items-center">
+          <Field
+            type="radio"
+            id="cashOnHand"
+            name="paymentMethod"
+            value="cash"
+            className="form-radio h-5 w-5 text-blue-600"
+          />
+          <label htmlFor="cashOnHand" className="ml-2 text-gray-700">
+            Cash on hand
+          </label>
+        </div>
       </div>
     </div>
   );
 };
 
-// Step 4: Facility Size
-const FacilityStep = ({ values, setFieldValue }) => {
+// Step 5: Summary
+const SummaryStep = ({ values }) => {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Facility Size</h2>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Area*</label>
-        <div className="flex items-center gap-2 mb-1">
-          <div className="text-sm text-gray-500">50 m</div>
-          <Field
-            type="range"
-            name="facilitySize"
-            min="50"
-            max="75"
-            className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer"
-          />
-          <div className="text-sm text-gray-500">75 m</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Step 5: Contact Information
-const ContactStep = () => {
-  return (
-    <div>
-      <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
-      <div className="grid grid-cols-1 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">First name*</label>
-          <Field
-            type="text"
-            name="firstName"
-            placeholder="Enter"
-            className="block w-full rounded-md border border-gray-300 p-2"
-          />
-          <ErrorMessage name="firstName" component="div" className="text-red-500 text-sm" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Last name*</label>
-          <Field
-            type="text"
-            name="lastName"
-            placeholder="Enter"
-            className="block w-full rounded-md border border-gray-300 p-2"
-          />
-          <ErrorMessage name="lastName" component="div" className="text-red-500 text-sm" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Phone number*</label>
-          <Field
-            type="tel"
-            name="phoneNumber"
-            placeholder="+962"
-            className="block w-full rounded-md border border-gray-300 p-2"
-          />
-          <ErrorMessage name="phoneNumber" component="div" className="text-red-500 text-sm" />
-        </div>
+      <h2 className="text-lg font-semibold mb-4">Summary</h2>
+      <div className="space-y-2">
+        <p><strong>Service:</strong> {values.selectedService}</p>
+        {values.selectedService === 'Residential Cleaning' && (
+          <p><strong>Number of Rooms:</strong> {values.numberOfRooms}</p>
+        )}
+        {values.selectedService === 'Office Cleaning' && (
+          <p><strong>Office Size:</strong> {values.officeSize} m²</p>
+        )}
+        {values.selectedService === 'Car Cleaning' && (
+          <p><strong>Car Type:</strong> {values.carType}</p>
+        )}
+        <p><strong>Date:</strong> {values.selectedDate}</p>
+        <p><strong>Time:</strong> {values.selectedTime}</p>
+        <p><strong>Frequency:</strong> {values.selectedFrequency}</p>
+        <p><strong>Name:</strong> {values.firstName} {values.lastName}</p>
+        <p><strong>Phone:</strong> {values.phoneNumber}</p>
+        <p><strong>Payment Method:</strong> {values.paymentMethod}</p>
+        {values.paymentMethod === 'card' && (
+          <>
+            <p><strong>Card Number:</strong> {values.cardNumber}</p>
+            <p><strong>Card Expiry:</strong> {values.cardExpiry}</p>
+            <p><strong>Cardholder Name:</strong> {values.cardholderName}</p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -203,10 +303,10 @@ const BookingPage = () => {
 
   const steps = [
     { component: ServiceStep, validationSchema: Yup.object({ selectedService: Yup.string().required('Required') }) },
-    { component: DateTimeStep, validationSchema: Yup.object({ selectedDate: Yup.string().required('Required') }) },
-    { component: FrequencyStep, validationSchema: Yup.object({ selectedFrequency: Yup.string().required('Required') }) },
-    { component: FacilityStep, validationSchema: Yup.object({ facilitySize: Yup.number().required('Required') }) },
-    { component: ContactStep, validationSchema: Yup.object({ firstName: Yup.string().required('Required') }) },
+    { component: DynamicFieldsStep, validationSchema: Yup.object({}) },
+    { component: CommonFieldsStep, validationSchema: Yup.object({ selectedDate: Yup.string().required('Required') }) },
+    { component: PaymentStep, validationSchema: Yup.object({ paymentMethod: Yup.string().required('Required') }) },
+    { component: SummaryStep, validationSchema: Yup.object({}) },
   ];
 
   const CurrentStep = steps[step].component;
@@ -221,16 +321,48 @@ const BookingPage = () => {
               selectedService: '',
               selectedDate: '',
               selectedTime: '',
-              selectedDuration: '',
               selectedFrequency: '',
-              facilitySize: 50,
               firstName: '',
               lastName: '',
               phoneNumber: '',
+              paymentMethod: '',
+              cardNumber: '',
+              cardExpiry: '',
+              cardCw: '',
+              cardholderName: '',
+              numberOfRooms: '',
+              officeSize: '',
+              carType: '',
             }}
             validationSchema={currentValidationSchema}
             onSubmit={(values) => {
-              console.log('Form submitted', values);
+              const filteredValues = { ...values };
+
+              switch (filteredValues.selectedService) {
+                case 'Residential Cleaning':
+                  delete filteredValues.officeSize;
+                  delete filteredValues.carType;
+                  break;
+                case 'Office Cleaning':
+                  delete filteredValues.numberOfRooms;
+                  delete filteredValues.carType;
+                  break;
+                case 'Car Cleaning':
+                  delete filteredValues.numberOfRooms;
+                  delete filteredValues.officeSize;
+                  break;
+                default:
+                  break;
+              }
+
+              if (filteredValues.paymentMethod === 'cash') {
+                delete filteredValues.cardNumber;
+                delete filteredValues.cardExpiry;
+                delete filteredValues.cardCw;
+                delete filteredValues.cardholderName;
+              }
+
+              console.log('Form submitted', filteredValues);
             }}
           >
             {({ values, setFieldValue }) => (
@@ -246,6 +378,7 @@ const BookingPage = () => {
                       Back
                     </button>
                   )}
+                  {console.log('Current step:', step, ' / steps.length:', steps.length)}
                   {step < steps.length - 1 ? (
                     <button
                       type="button"
@@ -259,7 +392,7 @@ const BookingPage = () => {
                       type="submit"
                       className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                     >
-                      Submit
+                      Book Now
                     </button>
                   )}
                 </div>

@@ -1,18 +1,28 @@
 // src/pages/Signup.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
 
 const Signup = () => {
+  const { setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
+  // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [termsChecked, setTermsChecked] = useState(false);
+
+  // Toggle visibility states
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [signUpMessage, setSignUpMessage] = useState('');
 
-  
+  // For displaying messages
+  const [signUpMessage, setSignUpMessage] = useState('');
+  const [isSuccessMessage, setIsSuccessMessage] = useState(false);
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -21,12 +31,53 @@ const Signup = () => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
-  
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) 
-      setSignUpMessage('Passwords do not match');
+
+    // Reset messages
+    setSignUpMessage('');
+    setIsSuccessMessage(false);
+
+    // 1) Basic client-side checks
+    if (password !== confirmPassword) {
+      setSignUpMessage('Passwords do not match.');
+      return;
+    }
+
+    if (!termsChecked) {
+      setSignUpMessage('Please accept the Terms of Service before signing up.');
+      return;
+    }
+
+    try {
+      // 2) Post data to back-end
+      const response = await axios.post('http://localhost:8000/api/auth/register', {
+        name,
+        email,
+        password
+      },{ withCredentials: true });
+
+      // 3) If status is 201 => success
+      if (response.status === 201) {
+        setSignUpMessage(response.data.message);  // "User registered successfully"
+        setIsSuccessMessage(true);
+
+        // 4) Update the user state in AuthContext
+        setUser(response.data.user); // Store the user in context
+
+        // 5) Wait 3 seconds and redirect to /login
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      }
+    } catch (error) {
+      // 6) Handle errors (Joi validation, user exists, etc.)
+      if (error.response && error.response.data && error.response.data.message) {
+        setSignUpMessage(error.response.data.message);
+      } else {
+        setSignUpMessage('An error occurred. Please try again.');
+      }
+    }
   };
 
   return (
@@ -35,9 +86,9 @@ const Signup = () => {
       <div className="hidden lg:block lg:w-1/2 relative">
         <img
           src="/images/signup-cover.jpg"
-          alt="Background Image"
+          alt="Background"
           className="absolute inset-0 object-cover h-full w-full"
-          style={{ filter: 'brightness(0.5)' }} 
+          style={{ filter: 'brightness(0.5)' }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
@@ -49,12 +100,25 @@ const Signup = () => {
       {/* Right Section (Form) */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-white">
         <div className="w-full max-w-md">
+          {/* Header */}
           <div className="text-center">
             <h2 className="text-4xl font-bold text-gray-800">Pristine Clean</h2>
             <p className="mt-3 text-gray-600">Sign up to get started</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4" id="sign-up-form">
+          {/* Display success or error message */}
+          {signUpMessage && (
+            <div
+              className={`mt-4 p-2 text-center font-semibold ${
+                isSuccessMessage ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              {signUpMessage}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {/* Google Button (optional) */}
             <button
               type="button"
               className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
@@ -63,6 +127,7 @@ const Signup = () => {
               Continue with Google
             </button>
 
+            {/* Divider */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
@@ -80,7 +145,6 @@ const Signup = () => {
               <input
                 type="text"
                 id="name"
-                name="name"
                 placeholder="Your Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -96,7 +160,6 @@ const Signup = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
                 placeholder="example@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -112,7 +175,6 @@ const Signup = () => {
               <input
                 type={passwordVisible ? 'text' : 'password'}
                 id="password"
-                name="password"
                 placeholder="Your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -144,7 +206,6 @@ const Signup = () => {
               <input
                 type={confirmPasswordVisible ? 'text' : 'password'}
                 id="confirmPassword"
-                name="confirmPassword"
                 placeholder="Confirm Your Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -174,11 +235,19 @@ const Signup = () => {
                 id="terms"
                 name="terms"
                 type="checkbox"
+                checked={termsChecked}
+                onChange={(e) => setTermsChecked(e.target.checked)}
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-500">
-                I agree to the <Link to="#" className="text-blue-500 hover:underline">Terms of Service</Link> and{' '}
-                <Link to="#" className="text-blue-500 hover:underline">Privacy Policy</Link>
+                I agree to the{' '}
+                <Link to="#" className="text-blue-500 hover:underline">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link to="#" className="text-blue-500 hover:underline">
+                  Privacy Policy
+                </Link>
               </label>
             </div>
 
@@ -194,7 +263,10 @@ const Signup = () => {
           </form>
 
           <p className="mt-4 text-sm text-center text-gray-500">
-            Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login</Link>.
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-500 hover:underline">
+              Login
+            </Link>.
           </p>
         </div>
       </div>

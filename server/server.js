@@ -1,26 +1,35 @@
-const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
-const bookRoutes = require("./routes/bookRoutes");
-const sequelize = require("./config/db"); 
+require('./models');
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const connectDB = require("./config/db");
+const authRoutes = require('./routes/auth');
+
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 8000;
+const path = require("path");
 
-// Middleware
+
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: (_, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
+connectDB();
 
 // Routes
-app.use("/", bookRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/uploads', express.static('uploads'));
 
-sequelize.sync({ alter: true }) 
-    .then(() => {
-        console.log("✅ Database synced successfully");
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error("❌ Database sync error:", err);
-    });
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+ 

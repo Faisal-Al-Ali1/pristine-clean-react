@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext'; // Make sure the AuthContext is properly set up
+import axios from 'axios';
 
 const Navbar = () => {
+  const { user, setUser } = useContext(AuthContext); // Access the user from AuthContext
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -10,6 +14,17 @@ const Navbar = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Call your backend logout endpoint (for example /api/auth/logout)
+      await axios.post('http://localhost:8000/api/auth/logout', {}, { withCredentials: true });
+      setUser(null); // Clear user state
+      navigate('/'); // Redirect to home or login
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -38,21 +53,33 @@ const Navbar = () => {
           <li><Link className="text-md text-gray-700 hover:text-gray-900" to="/contactUs">Contact us</Link></li>
         </ul>
 
-        {/* Auth Buttons (Sign In/Sign Up) */}
+        {/* Auth Buttons (Sign In/Sign Up) or Profile & Logout */}
         <div id="authButtons" className="hidden lg:flex lg:items-center">
-          <Link className="py-2 px-4 sm:px-6 bg-gray-200 hover:bg-gray-300 text-sm text-gray-900 font-bold rounded-xl transition duration-200"
-            to="/login">Sign In</Link>
-          <Link className="py-2 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 text-sm text-white font-bold rounded-xl transition duration-200 ml-3"
-            to="/signup">Sign Up</Link>
-
-            {/* Profile Image */}
-          <Link to="/userProfile" className="ml-3">
-            <img 
-              src="../images/user.png" // Replace with your profile image path
-              alt="Profile" 
-              className="h-10 w-10 rounded-full cursor-pointer" 
-            />
-          </Link>
+          {!user ? (
+            <>
+              <Link className="py-2 px-4 sm:px-6 bg-gray-200 hover:bg-gray-300 text-sm text-gray-900 font-bold rounded-xl transition duration-200"
+                to="/login">Sign In</Link>
+              <Link className="py-2 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 text-sm text-white font-bold rounded-xl transition duration-200 ml-3"
+                to="/signup">Sign Up</Link>
+            </>
+          ) : (
+            <>
+              {/* Profile Image */}
+              <Link to="/userProfile" className="ml-3">
+                <img
+                  src="../images/user.png" // Replace with your profile image path
+                  alt="Profile"
+                  className="h-10 w-10 rounded-full cursor-pointer"
+                />
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="ml-4 py-2 px-4 sm:px-6 bg-gray-200 hover:bg-gray-300 text-sm text-red-600 font-bold rounded-xl transition duration-200 hover:cursor-pointer"
+              >
+                Logout
+              </button>
+            </>
+          )}
         </div>
       </nav>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout';
 import HomePage from './components/home/homepage';
 import Services from './components/services/services';
@@ -14,6 +15,7 @@ import BookingPage from './components/booking/bookingPage';
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Layout><HomePage /></Layout>} />
@@ -27,6 +29,7 @@ function App() {
         <Route path="/bookingPage" element={<Layout><BookingPage /></Layout>} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
