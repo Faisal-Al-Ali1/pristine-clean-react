@@ -1,57 +1,49 @@
-// models/Booking.js
-
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
-const bookingSchema = new Schema(
-  {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    service: {
-      type: Schema.Types.ObjectId,
-      ref: 'Service',
-      required: true
-    },
-    date: {
-      type: Date,
-      required: true
-    },
-    location: {
-      street: { type: String },
-
-      city: { type: String },
-
-      governorate: { type: String },
-
-      postalCode: { type: String },
-      
-      country: { type: String, default: 'Jordan'}
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'confirmed', 'completed', 'canceled'],
-      default: 'pending'
-    },
-    specialInstructions: {
-      type: String,
-      default: ''
-    },
-    payment: {
-      type: Schema.Types.ObjectId,
-      ref: 'Payment',
-      default: null
-    },
-    additionalDetails: {
-      type: Schema.Types.Mixed, // allows any form data specific to the chosen service
-      default: {}
-    }
+const bookingSchema = new mongoose.Schema({
+  user: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
   },
-  {
-    timestamps: true
+  service: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Service', 
+    required: true 
+  },
+  date: { 
+    type: Date, 
+    required: true 
+  },
+  endTime: Date, // Auto-calculated
+  location: {
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    country: { type: String, default: 'Jordan' }
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'completed', 'canceled'],
+    default: 'pending'
+  },
+  specialInstructions: String,
+  payment: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Payment' 
+  },
+  additionalDetails: mongoose.Schema.Types.Mixed // For room count, pets, etc.
+}, { timestamps: true });
+
+// Auto-calculate endTime before saving
+bookingSchema.pre('save', async function(next) {
+  if (this.isModified('date') || this.isNew) {
+    const service = await mongoose.model('Service').findById(this.service);
+    if (service) {
+      this.endTime = new Date(this.date);
+      this.endTime.setHours(this.endTime.getHours() + service.estimatedDuration);
+    }
   }
-);
+  next();
+});
 
 module.exports = mongoose.model('Booking', bookingSchema);

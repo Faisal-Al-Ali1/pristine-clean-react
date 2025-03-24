@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const upload = require('../middlewares/upload'); // Import the Multer middleware
 const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');

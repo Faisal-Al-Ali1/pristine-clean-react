@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext'; // Make sure the AuthContext is properly set up
-import axios from 'axios';
+import { logout } from '../../api/users';
 
 const Navbar = () => {
   const { user, setUser } = useContext(AuthContext); // Access the user from AuthContext
@@ -18,10 +18,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Call your backend logout endpoint (for example /api/auth/logout)
-      await axios.post('http://localhost:8000/api/auth/logout', {}, { withCredentials: true });
+
+      await logout(); // Call the shared logout method
+
       setUser(null); // Clear user state
+
       navigate('/'); // Redirect to home or login
+      
     } catch (error) {
       console.error('Logout failed:', error);
     }

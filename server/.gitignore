@@ -4,6 +4,9 @@ node_modules/
 # Environment variables file
 .env
 
+# Multer Uploads Folder
+/uploads/
+
 # Logs
 *.log
 npm-debug.log*

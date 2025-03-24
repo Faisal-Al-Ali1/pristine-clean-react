@@ -29,7 +29,7 @@ const userSchema = new Schema(
     },
     address: {
       street: { type: String },
-      city: { type: String },      // e.g., Amman, Zarqa, Irbid...
+      city: { type: String },      
       country: { type: String, default: 'Jordan' }
     },
     role: {

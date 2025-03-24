@@ -9,11 +9,6 @@ const serviceSchema = new Schema(
       required: true,
       unique: true
     },
-    // If you need multiple languages:
-    // description: {
-    //   en: { type: String, default: '' },
-    //   ar: { type: String, default: '' }
-    // },
     description: {
       type: String,
       default: ''
@@ -22,16 +17,45 @@ const serviceSchema = new Schema(
       type: Number,
       required: true
     },
-    currency: {
-      type: String,
-      default: 'JOD'
-    },
     estimatedDuration: {
       type: Number, // e.g., in hours
       default: 2
+    },
+    imageUrl: {
+      type: String, // This will store the relative path
+      required: true
+    },
+    detailedDescription: {
+      type: String,
+      default: ''
+    },
+    includedServices: [
+      {
+        title: {
+          type: String,
+          required: true
+        },
+        description: {
+          type: String,
+          required: true
+        },
+        _id: false // Disable _id for subdocuments
+      }
+    ],
+    isDeleted: {
+      type: Boolean,
+      default: false
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true } // Include virtuals in the response
+  }
 );
+
+// Virtual property for currency (always JOD)
+serviceSchema.virtual('currency').get(function () {
+  return 'JOD';
+});
 
 module.exports = mongoose.model('Service', serviceSchema);
