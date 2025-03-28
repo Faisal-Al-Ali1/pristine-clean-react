@@ -21,7 +21,7 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['credit_card', 'paypal', 'cash'], // Updated: Replaced 'stripe' with 'paypal'
+    enum: ['credit_card', 'paypal', 'cash'], 
     required: true
   },
   status: {

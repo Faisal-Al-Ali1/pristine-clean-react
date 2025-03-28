@@ -1,19 +1,40 @@
-// Validate booking time (8AM to 8PM)
-exports.validateBookingTime = (date) => {
-    const hours = date.getHours();
-    return hours >= 8 && hours <= 20;
+const mongoose = require('mongoose');
+const Booking = require('../models/Booking');
+
+/**
+ * Simple business hours check (8AM-8PM)
+ * Now uses the raw Date object without timezone conversion
+ */
+const isWithinBusinessHours = (date) => {
+  const hours = date.getHours();
+  return hours >= 8 && hours < 20; // 8AM-7:59PM
+};
+
+/**
+ * Atomic slot availability check with transaction support
+ */
+const isSlotAvailable = async (startTime, durationHours, excludeBookingId = null, session = null) => {
+  const endTime = new Date(startTime.getTime() + durationHours * 60 * 60 * 1000);
+
+  const query = {
+    status: { $in: ['pending', 'confirmed'] },
+    $or: [
+      // Check for overlapping time slots
+      { date: { $lt: endTime }, endTime: { $gt: startTime } }
+    ]
   };
+
+  if (excludeBookingId) {
+    query._id = { $ne: excludeBookingId };
+  }
+
+  const options = session ? { session } : {};
+  const count = await Booking.countDocuments(query, options);
   
-  // Check if a time slot is available (optional)
-  exports.isTimeSlotAvailable = async (startTime, durationHours) => {
-    const endTime = new Date(startTime);
-    endTime.setHours(endTime.getHours() + durationHours);
-  
-    const overlappingBookings = await Booking.find({
-      $or: [
-        { date: { $lt: endTime }, endTime: { $gt: startTime } }
-      ]
-    });
-  
-    return overlappingBookings.length === 0;
-  };
+  return count === 0;
+};
+
+module.exports = {
+  isWithinBusinessHours,
+  isSlotAvailable
+};

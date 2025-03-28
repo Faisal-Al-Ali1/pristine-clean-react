@@ -16,6 +16,15 @@ const bookingSchema = new mongoose.Schema({
     required: true 
   },
   endTime: Date, // Auto-calculated
+  frequency: {
+    type: String,
+    enum: ['once', 'weekly', 'biweekly', 'monthly'],
+    default: 'once'
+  },
+  contactInfo: {
+    phone: { type: String, required: true },
+    email: { type: String, required: true }
+  },
   location: {
     street: { type: String, required: true },
     city: { type: String, required: true },

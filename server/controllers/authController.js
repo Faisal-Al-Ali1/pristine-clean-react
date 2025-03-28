@@ -76,7 +76,7 @@ exports.register = async (req, res) => {
     await newUser.save();
 
     // 4) (Optional) Generate JWT upon registration
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser._id, role: newUser.role  }, process.env.JWT_SECRET, {
       expiresIn: '1h'
     });
 
@@ -203,7 +203,7 @@ exports.getMe = async (req, res) => {
       console.error(error);
       return res.status(500).json({ message: 'Server error' });
     }
-  };
+};
 
 exports.getProfile = async (req, res) => {
     try {
@@ -236,9 +236,9 @@ exports.getProfile = async (req, res) => {
       console.error('Error fetching profile:', error);
       return res.status(500).json({ message: 'Server error' });
     }
-  };
+};
 
-  exports.updateProfile = async (req, res) => {
+exports.updateProfile = async (req, res) => {
     try {
       const userId = req.user.userId; // Get the userId from the authenticated user
       console.log("User ID:", userId); // Debugging step
@@ -286,5 +286,5 @@ exports.getProfile = async (req, res) => {
       console.error('Error updating profile:', error);
       return res.status(500).json({ message: 'Server error' });
     }
-  };
+};
   

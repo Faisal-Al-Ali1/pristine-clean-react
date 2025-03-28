@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { createPayment, verifyPayPalPayment, verifyCashPayment } = require('../controllers/paymentController');
+const { createPayment, paypalSuccess, paypalCancel, verifyCashPayment, processRefund } = require('../controllers/paymentController');
 const { isAuthenticated, isAdmin } = require('../middlewares/authMiddleware');
 
-// JWT cookie authentication required for all routes
-router.use(isAuthenticated);
 
 // Payment routes
-router.post('/', createPayment); // Handle all payment methods
-router.post('/paypal/verify', verifyPayPalPayment); // PayPal callback
-router.post('/:id/verify-cash', isAdmin, verifyCashPayment); // Admin-only
+router.post('/', isAuthenticated, createPayment); // Handle all payment methods
+router.get('/paypal/success', paypalSuccess); 
+router.get('/paypal/cancel', paypalCancel); 
+router.put('/:id/verify-cash', isAuthenticated, verifyCashPayment); // Admin-only (add isAdmin)
+router.post('/:id/refund', isAuthenticated, processRefund); // Admin-only (add isAdmin)
 
 module.exports = router;
