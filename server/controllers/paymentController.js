@@ -232,15 +232,15 @@ exports.paypalSuccess = async (req, res) => {
     // Update booking status
     payment.booking.status = 'confirmed';
     await payment.booking.save({ session });
-
     await session.commitTransaction();
-    res.send('Payment successful! Booking confirmed.');
+
+    // Redirect to frontend success page with booking ID
+    res.redirect(`http://localhost:5173/payment-success?bookingId=${payment.booking._id}`);
 
   } catch (error) {
     await session.abortTransaction();
     console.error('PayPal capture error:', error.response?.data || error.message);
-    res.status(500).send('Payment verification failed');
-  } finally {
+    res.redirect(`http://localhost:5173/payment-error?message=Payment verification failed`);  } finally {
     session.endSession();
   }
 };
@@ -266,21 +266,21 @@ exports.paypalCancel = async (req, res) => {
 
     if (!payment) {
       await session.abortTransaction();
-      return res.status(404).send('Payment not found');
+      return res.status(404).redirect(`http://localhost:5173/payment-cancelled?message=Payment not found`);
     }
 
     // Remove failed payment reference from booking
     payment.booking.payment = undefined;
     await payment.booking.save({ session });
-
     await session.commitTransaction();
-    res.send('Payment canceled. You may try again.');
+
+    res.redirect(`http://localhost:5173/payment-cancelled?bookingId=${payment.booking._id}`);
 
   } catch (error) {
     await session.abortTransaction();
     console.error('PayPal cancel error:', error);
-    res.status(500).send('Error processing cancellation');
-  } finally {
+    res.redirect(`http://localhost:5173/payment-error?message=Error processing cancellation`);
+    } finally {
     session.endSession();
   }
 };

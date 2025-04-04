@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
+const Review = require('../models/Review');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtils');
@@ -39,7 +40,7 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
           throw { status: 400, message: 'Invalid date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)' };
         }
   
-        // 3. Check Business Hours (8AM-8PM Jordan Time)
+        // 3. Check Business Hours (8AM-8PM)
         if (!isWithinBusinessHours(bookingDate)) {
           throw { status: 400, message: 'Bookings only available between 8AM and 8PM' };
         }
@@ -117,31 +118,63 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
         // 10. Create Booking
         const booking = await Booking.create([bookingData], { session });
         
-        // 11. Response
-        res.status(201).json({ 
-          success: true, 
-          data: booking[0],
-          message: 'Booking created successfully'
-        });
+        // 11. Populate with only the needed service fields
+        const populatedBooking = await Booking.findById(booking[0]._id)
+        .populate({
+          path: 'service',
+          select: 'name description basePrice estimatedDuration currency includedServices'
+        })
+        .session(session);
+
+      if (!populatedBooking) {
+        throw { status: 500, message: 'Failed to populate booking details' };
+      }
+
+      // 12. Response with optimized structure
+      res.status(201).json({ 
+        success: true, 
+        data: {
+          _id: populatedBooking._id,
+          user: populatedBooking.user,
+          service: {
+            _id: populatedBooking.service._id,
+            name: populatedBooking.service.name,
+            description: populatedBooking.service.description,
+            basePrice: populatedBooking.service.basePrice,
+            estimatedDuration: populatedBooking.service.estimatedDuration,
+            currency: populatedBooking.service.currency,
+            includedServices: populatedBooking.service.includedServices
+          },
+          date: populatedBooking.date,
+          endTime: populatedBooking.endTime,
+          frequency: populatedBooking.frequency,
+          contactInfo: populatedBooking.contactInfo,
+          location: populatedBooking.location,
+          status: populatedBooking.status,
+          specialInstructions: populatedBooking.specialInstructions,
+          createdAt: populatedBooking.createdAt
+        },
+        message: 'Booking created successfully'
       });
-    } catch (error) {
-      console.error('Booking creation error:', error);
-      
-      const status = error.status || 500;
-      const message = error.message || 'Failed to create booking';
-      
-      res.status(status).json({ 
-        success: false, 
-        message,
-        error: process.env.NODE_ENV === 'development' ? {
-          message: error.message,
-          stack: error.stack
-        } : undefined
-      });
-    } finally {
-        session.endSession();
-    }
-};
+    });
+  } catch (error) {
+    console.error('Booking creation error:', error);
+    
+    const status = error.status || 500;
+    const message = error.message || 'Failed to create booking';
+    
+    res.status(status).json({ 
+      success: false, 
+      message,
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
+    });
+  } finally {
+    session.endSession();
+  }
+  };
 
 /**
  * @desc    Update a booking
@@ -265,30 +298,58 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
   
         await booking.save({ session });
   
-        res.json({ 
-          success: true, 
-          data: booking,
-          message: 'Booking updated successfully'
-        });
+        const populatedBooking = await Booking.findById(booking._id)
+        .populate({
+          path: 'service',
+          select: 'name description basePrice estimatedDuration currency includedServices'
+        })
+        .session(session);
+
+      // 9. Return structured response
+      res.json({ 
+        success: true, 
+        data: {
+          _id: populatedBooking._id,
+          service: {
+            _id: populatedBooking.service._id,
+            name: populatedBooking.service.name,
+            description: populatedBooking.service.description,
+            basePrice: populatedBooking.service.basePrice,
+            estimatedDuration: populatedBooking.service.estimatedDuration,
+            currency: populatedBooking.service.currency,
+            includedServices: populatedBooking.service.includedServices
+          },
+          date: populatedBooking.date,
+          endTime: populatedBooking.endTime,
+          frequency: populatedBooking.frequency,
+          contactInfo: populatedBooking.contactInfo,
+          location: populatedBooking.location,
+          status: populatedBooking.status,
+          specialInstructions: populatedBooking.specialInstructions,
+          createdAt: populatedBooking.createdAt,
+          updatedAt: populatedBooking.updatedAt
+        },
+        message: 'Booking updated successfully'
       });
-    } catch (error) {
-      console.error('Booking update error:', error);
-      
-      const status = error.status || 500;
-      const message = error.message || 'Failed to update booking';
-      
-      res.status(status).json({ 
-        success: false, 
-        message,
-        error: process.env.NODE_ENV === 'development' ? {
-          message: error.message,
-          stack: error.stack
-        } : undefined
-      });
-    } finally {
-      session.endSession();
-    }
-  };
+    });
+  } catch (error) {
+    console.error('Booking update error:', error);
+    
+    const status = error.status || 500;
+    const message = error.message || 'Failed to update booking';
+    
+    res.status(status).json({ 
+      success: false, 
+      message,
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
+    });
+  } finally {
+    session.endSession();
+  }
+};
 
 /**
  * @desc    Get all bookings for current user
@@ -298,9 +359,12 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
   exports.getUserBookings = async (req, res) => {
     try {
       const bookings = await Booking.find({ user: req.user.userId })
-        .populate('service', 'name basePrice imageUrl estimatedDuration')
-        .populate('payment', 'amount status paymentMethod')
-        .sort({ date: -1 });
+      .populate({
+        path: 'service',
+        select: 'name description basePrice estimatedDuration currency includedServices imageUrl'
+      })
+      .populate('payment', 'amount status paymentMethod')
+      .sort({ date: -1 });
   
       res.json({ 
         success: true, 
@@ -326,8 +390,11 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
         _id: req.params.id,
         user: req.user.userId
       })
-      .populate('service')
-      .populate('payment');
+      .populate({
+        path: 'service',
+        select: 'name description basePrice estimatedDuration currency includedServices'
+      })
+      .populate('payment', 'amount status paymentMethod');  
   
       if (!booking) {
         return res.status(404).json({ 
@@ -369,7 +436,7 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
       if (!booking) {
         return res.status(404).json({ 
           success: false, 
-          message: 'Booking not found or cannot be canceled' 
+          message: 'Booking not found or has been canceled already' 
         });
       }
   
@@ -386,3 +453,130 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
     }
   };
   
+ /**
+ * @desc    Submit a review for a completed booking
+ * @route   POST /api/bookings/:id/reviews
+ * @access  Private
+ */
+ exports.submitReview = async (req, res) => {
+  const session = await mongoose.startSession();
+  
+  try {
+    await session.withTransaction(async () => {
+      const { rating, comment } = req.body;
+      const bookingId = req.params.id;
+      const userId = req.user.userId;
+
+      // 1. Validate booking ID format first
+      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+        throw { status: 400, message: 'Invalid booking ID format' };
+      }
+
+      // 2. Validate input
+      if (!rating || rating < 1 || rating > 5) {
+        throw { status: 400, message: 'Rating must be between 1 and 5' };
+      }
+
+      // 3. Find the booking
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        user: userId,
+        status: 'completed'
+      }).session(session);
+
+      if (!booking) {
+        throw { 
+          status: 404, 
+          message: 'Completed booking not found or you are not authorized' 
+        };
+      }
+
+      // 4. Check if review already exists
+      if (booking.hasReview) {
+        throw { status: 400, message: 'Review already submitted for this booking' };
+      }
+
+      // 5. Create the review
+      const review = await Review.create([{
+        user: userId,
+        service: booking.service,
+        booking: bookingId,
+        rating,
+        comment: comment || ''
+      }], { session });
+
+      // 6. Update the booking with review reference
+      booking.review = review[0]._id;
+      booking.hasReview = true;
+      await booking.save({ session });
+
+      // 7. Update service rating stats (optional)
+      await Service.updateRatingStats(booking.service, session);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          reviewId: review[0]._id,
+          bookingId: booking._id,
+          rating,
+          comment: comment || ''
+        },
+        message: 'Review submitted successfully'
+      });
+    });
+  } catch (error) {
+    console.error('Review submission error:', error);
+    
+    const status = error.status || 500;
+    const message = error.message || 'Failed to submit review';
+    
+    res.status(status).json({ 
+      success: false, 
+      message,
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
+    });
+  } finally {
+    session.endSession();
+  }
+ };
+
+/**
+ * @desc    Get review for a booking
+ * @route   GET /api/bookings/:id/reviews
+ * @access  Private
+ */
+ exports.getBookingReview = async (req, res) => {
+  try {
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      user: req.user.userId
+    }).populate('review');
+
+    if (!booking) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Booking not found' 
+      });
+    }
+
+    if (!booking.hasReview) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No review found for this booking' 
+      });
+    }
+
+    res.json({
+      success: true,
+      data: booking.review
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to retrieve review'
+    });
+  }
+ };

@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext'; // Make sure the AuthContext is properly set up
+import { AuthContext } from '../../context/AuthContext'; 
 import { logout } from '../../api/users';
 
 const Navbar = () => {
-  const { user, setUser } = useContext(AuthContext); // Access the user from AuthContext
+  const { user, setUser } = useContext(AuthContext); 
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -19,11 +19,11 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
 
-      await logout(); // Call the shared logout method
+      await logout(); 
 
-      setUser(null); // Clear user state
+      setUser(null); 
 
-      navigate('/'); // Redirect to home or login
+      navigate('/'); 
       
     } catch (error) {
       console.error('Logout failed:', error);
@@ -70,7 +70,7 @@ const Navbar = () => {
               {/* Profile Image */}
               <Link to="/userProfile" className="ml-3">
                 <img
-                  src="../images/user.png" // Replace with your profile image path
+                  src="../images/user.png" 
                   alt="Profile"
                   className="h-10 w-10 rounded-full cursor-pointer"
                 />

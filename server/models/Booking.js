@@ -35,6 +35,14 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'completed', 'canceled'],
     default: 'pending'
   },
+  review: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  },
+  hasReview: {
+    type: Boolean,
+    default: false
+  },
   specialInstructions: String,
   payment: { 
     type: mongoose.Schema.Types.ObjectId, 

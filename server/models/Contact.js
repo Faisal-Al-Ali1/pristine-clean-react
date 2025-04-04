@@ -1,4 +1,3 @@
-// models/Contact.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -24,10 +23,10 @@ const contactSchema = new Schema(
       type: String,
       required: true
     },
-    // Optional: status (e.g. 'new', 'read', 'resolved')
+    // Optional: status (e.g. 'new', 'read')
     status: {
       type: String,
-      enum: ['new', 'read', 'resolved'],
+      enum: ['new', 'read'],
       default: 'new'
     }
   },

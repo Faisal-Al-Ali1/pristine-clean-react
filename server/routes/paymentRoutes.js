@@ -8,7 +8,7 @@ const { isAuthenticated, isAdmin } = require('../middlewares/authMiddleware');
 router.post('/', isAuthenticated, createPayment); // Handle all payment methods
 router.get('/paypal/success', paypalSuccess); 
 router.get('/paypal/cancel', paypalCancel); 
-router.put('/:id/verify-cash', isAuthenticated, verifyCashPayment); // Admin-only (add isAdmin)
-router.post('/:id/refund', isAuthenticated, processRefund); // Admin-only (add isAdmin)
+router.put('/:id/verify-cash', isAuthenticated, isAdmin, verifyCashPayment); // Admin-only 
+router.post('/:id/refund', isAuthenticated, isAdmin, processRefund); // Admin-only 
 
 module.exports = router;

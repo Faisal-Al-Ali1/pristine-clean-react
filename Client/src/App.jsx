@@ -11,6 +11,9 @@ import ContactUs from './components/contact/contactus';
 import UserProfile from './components/profile/userProfile';
 import ProductDetails from './components/details/productDetails';
 import BookingPage from './components/booking/bookingPage';
+import PaymentSuccess from './components/booking/PaymentSuccess';
+import PaymentCancelled from './components/booking/PaymentCancelled';
+import PaymentError from './components/booking/PaymentError';
 
 
 function App() {
@@ -27,6 +30,9 @@ function App() {
         <Route path="/contactUs" element={<Layout><ContactUs /></Layout>} />
         <Route path="/userProfile" element={<Layout><UserProfile /></Layout>} />
         <Route path="/bookingPage" element={<Layout><BookingPage /></Layout>} />
+        <Route path="/payment-success" element={<Layout><PaymentSuccess /></Layout>} />
+        <Route path="/payment-cancelled" element={<Layout><PaymentCancelled /></Layout>} />
+        <Route path="/payment-error" element={<Layout><PaymentError /></Layout>} />
       </Routes>
     </Router>
     </AuthProvider>
