@@ -65,13 +65,26 @@ exports.submitContactForm = async (req, res) => {
  */
 exports.getContactSubmissions = async (req, res) => {
   try {
-    const submissions = await Contact.find()
+    const { status, subject, page = 1, limit = 5 } = req.query;
+    
+    const query = {};
+    if (status && status !== 'all') query.status = status;
+    if (subject && subject !== 'all') query.subject = subject;
+
+    const submissions = await Contact.find(query)
       .sort({ createdAt: -1 })
-      .select('-__v');
+      .select('-__v')
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Contact.countDocuments(query);
 
     res.json({
       success: true,
       count: submissions.length,
+      total,
+      pages: Math.ceil(total / limit),
+      currentPage: parseInt(page),
       data: submissions
     });
   } catch (error) {

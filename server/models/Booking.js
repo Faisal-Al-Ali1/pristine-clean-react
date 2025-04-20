@@ -30,6 +30,11 @@ const bookingSchema = new mongoose.Schema({
     city: { type: String, required: true },
     country: { type: String, default: 'Jordan' }
   },
+  assignedCleaner: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
+  },
+  cleanerNotes: String, 
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'completed', 'canceled'],

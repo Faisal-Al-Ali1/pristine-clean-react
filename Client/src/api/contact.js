@@ -21,11 +21,20 @@ export const submitContactForm = async (formData) => {
 
 /**
  * Get all contact submissions (admin only)
+ * @param {object} filters - Filter options
+ * @param {number} page - Page number
+ * @param {number} limit - Items per page
  * @returns {Promise<Array>} - Array of contact submissions
  */
-export const getContactSubmissions = async () => {
+export const getContactSubmissions = async ({ status, subject }, page = 1, limit = 10) => {
   try {
-    const response = await api.get('/contact');
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (subject) params.append('subject', subject);
+    params.append('page', page);
+    params.append('limit', limit);
+
+    const response = await api.get(`/contact?${params.toString()}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching contact submissions:', error.response?.data || error.message);

@@ -1,4 +1,3 @@
-// models/Service.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -7,6 +6,7 @@ const serviceSchema = new Schema(
     name: {
       type: String,
       required: true,
+      index: true,
       unique: true
     },
     description: {

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const contactController = require('../controllers/contactController');
+const {submitContactForm, getContactSubmissions, updateContactStatus } = require('../controllers/contactController');
 const {isAuthenticated, isAdmin } = require('../middlewares/authMiddleware');
 const { contactRateLimiter } = require('../utils/rateLimiter');
 
 // Public routes
-router.post('/', contactRateLimiter, contactController.submitContactForm);
+router.post('/', contactRateLimiter, submitContactForm);
 
 // Admin protected routes
-router.get('/', isAuthenticated, isAdmin, contactController.getContactSubmissions);
-router.put('/:id/status', isAuthenticated, isAdmin, contactController.updateContactStatus);
+router.get('/', isAuthenticated, isAdmin, getContactSubmissions);
+router.put('/:id/status', isAuthenticated, isAdmin, updateContactStatus);
 
 module.exports = router;

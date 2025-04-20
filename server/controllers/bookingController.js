@@ -326,6 +326,8 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
           location: populatedBooking.location,
           status: populatedBooking.status,
           specialInstructions: populatedBooking.specialInstructions,
+          assignedCleaner: populatedBooking.assignedCleaner,
+          cleanerNotes: populatedBooking.cleanerNotes,
           createdAt: populatedBooking.createdAt,
           updatedAt: populatedBooking.updatedAt
         },
@@ -364,6 +366,7 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
         select: 'name description basePrice estimatedDuration currency includedServices imageUrl'
       })
       .populate('payment', 'amount status paymentMethod')
+      .populate('assignedCleaner', 'name phoneNumber')
       .sort({ date: -1 });
   
       res.json({ 
@@ -394,7 +397,8 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
         path: 'service',
         select: 'name description basePrice estimatedDuration currency includedServices'
       })
-      .populate('payment', 'amount status paymentMethod');  
+      .populate('payment', 'amount status paymentMethod')
+      .populate('assignedCleaner', 'name phoneNumber');  
   
       if (!booking) {
         return res.status(404).json({ 
@@ -419,7 +423,7 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
   /**
    * @desc    Cancel a booking
    * @route   DELETE /api/bookings/:id
-   * @access  Private
+   * @access  Private (user or Admin)
    */
   exports.cancelBooking = async (req, res) => {
     try {
@@ -580,3 +584,108 @@ const { isWithinBusinessHours, isSlotAvailable } = require('../utils/bookingUtil
     });
   }
  };
+
+
+
+
+/**
+ * @desc    Get bookings for current cleaner (Cleaner only)
+ * @route   GET /api/bookings/cleaner/my-bookings
+ * @access  Private/Cleaner
+ */
+exports.getCleanerBookingsSelf = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const cleanerId = req.user.userId;
+
+    // Build the query - must be assigned to this cleaner
+    const query = { assignedCleaner: cleanerId };
+    if (status) query.status = status;
+
+    const bookings = await Booking.find(query)
+    .populate({
+      path: 'service',
+      select: 'name basePrice estimatedDuration',
+      transform: doc => ({
+        name: doc.name,
+        basePrice: doc.basePrice,
+        estimatedDuration: doc.estimatedDuration
+      })
+    })
+    .populate({
+      path: 'user',
+      select: 'name phoneNumber address',
+      transform: doc => ({
+        name: doc.name,
+        phoneNumber: doc.phoneNumber,
+        address: doc.address
+      })
+    })
+    .lean()
+    .sort({ date: 1 });
+
+    res.json({
+      success: true,
+      count: bookings.length,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching cleaner bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch your bookings',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/**
+ * @desc    Complete a booking (Cleaner only)
+ * @route   PUT /api/bookings/:id/complete
+ * @access  Private/Cleaner
+ */
+exports.completeBooking = async (req, res) => {
+  const session = await mongoose.startSession();
+  
+  try {
+    await session.withTransaction(async () => {
+      const bookingId = req.params.id;
+      const cleanerId = req.user.userId;
+
+      // 1. Validate booking exists and is assigned to this cleaner
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        assignedCleaner: cleanerId,
+        status: 'confirmed'
+      }).session(session);
+
+      if (!booking) {
+        throw { 
+          status: 404, 
+          message: 'Booking not found or not assigned to you' 
+        };
+      }
+
+      // 2. Update status
+      booking.status = 'completed';
+      await booking.save({ session });
+
+      res.json({
+        success: true,
+        data: booking,
+        message: 'Booking marked as completed'
+      });
+    });
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || 'Failed to complete booking';
+    
+    res.status(status).json({ 
+      success: false, 
+      message,
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
+  } finally {
+    session.endSession();
+  }
+};

@@ -11,6 +11,20 @@ export const getAllServices = async () => {
   }
 };
 
+// Fetch all services (Admin)
+export const getAllServicesAdmin = async (body) => {
+  try {
+    const response = await api.get('/services/admin', body);
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    };
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    throw error;
+  }
+};
+
 // Fetch a single service by ID
 export const getServiceById = async (id) => {
   try {
@@ -23,9 +37,13 @@ export const getServiceById = async (id) => {
 };
 
 // Create a new service
-export const createService = async (serviceData) => {
+export const createService = async (formdata) => {
   try {
-    const response = await api.post('/services', serviceData);
+    const response = await api.post('/services', formdata, {
+      headers: {
+        'Content-Type': 'multipart/form-data' 
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating service:', error);
@@ -34,9 +52,13 @@ export const createService = async (serviceData) => {
 };
 
 // Update a service
-export const updateService = async (id, serviceData) => {
+export const updateService = async (id, formdata) => {
   try {
-    const response = await api.put(`/services/${id}`, serviceData);
+    const response = await api.put(`/services/${id}`, formdata, {
+      headers: {
+        'Content-Type': 'multipart/form-data' 
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating service:', error);

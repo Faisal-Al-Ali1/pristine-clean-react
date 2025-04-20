@@ -23,7 +23,6 @@ const contactSchema = new Schema(
       type: String,
       required: true
     },
-    // Optional: status (e.g. 'new', 'read')
     status: {
       type: String,
       enum: ['new', 'read'],

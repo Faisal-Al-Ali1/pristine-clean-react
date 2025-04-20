@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { isAuthenticated } = require('../middlewares/authMiddleware');
-const { createBooking, getUserBookings, getBooking, updateBooking, cancelBooking, submitReview, getBookingReview } = require('../controllers/bookingController');
+const { isAuthenticated,isAdmin, isCleaner } = require('../middlewares/authMiddleware');
+const { createBooking, getUserBookings, getBooking, updateBooking, cancelBooking, submitReview, getBookingReview, completeBooking, getCleanerBookingsSelf } = require('../controllers/bookingController');
 
 // Create a new booking
 router.post('/', isAuthenticated, createBooking);
@@ -23,5 +23,10 @@ router.post('/:id/reviews', isAuthenticated, submitReview);
 
 // Get a review
 router.get('/:id/reviews', isAuthenticated, getBookingReview);
+
+
+// Cleaner routes
+router.get('/cleaner/my-bookings', isAuthenticated, isCleaner, getCleanerBookingsSelf);
+router.put('/:id/complete', isAuthenticated, isCleaner, completeBooking);
 
 module.exports = router;

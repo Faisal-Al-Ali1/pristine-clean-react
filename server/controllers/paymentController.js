@@ -91,7 +91,7 @@ exports.createPayment = async (req, res) => {
 
         // Instant mock success response
         payment.status = 'completed';
-        payment.transactionId = `mock_cc_${Date.now()}`;
+        payment.transactionId = `cc_${Date.now()}`;
         payment.paymentDetails = {
           last4: cardDetails.number.slice(-4),
           brand: cardDetails.number.startsWith('4') ? 'visa' : 
@@ -143,7 +143,9 @@ exports.createPayment = async (req, res) => {
         break;
 
       case 'cash':
-        // No immediate action needed
+
+        payment.transactionId = `cash_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        payment.status = 'pending';
         break;
     }
 
@@ -443,5 +445,490 @@ exports.processRefund = async (req, res) => {
     });
   } finally {
     session.endSession();
+  }
+};
+
+/**
+ * @desc    Get payment statistics for admin dashboard
+ * @route   GET /api/payments/stats
+ * @access  Private/Admin
+ */
+exports.getPaymentStats = async (req, res) => {
+  try {
+    // Calculate date ranges
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+
+    // Get all completed payments
+    const allPayments = await Payment.find({ status: 'completed' });
+
+    // Total revenue calculations
+    const totalRevenue = allPayments.reduce((sum, payment) => sum + payment.amount, 0);
+    const monthlyRevenue = allPayments
+      .filter(p => p.createdAt >= startOfMonth)
+      .reduce((sum, payment) => sum + payment.amount, 0);
+    const lastMonthRevenue = allPayments
+      .filter(p => p.createdAt >= startOfLastMonth && p.createdAt < startOfMonth)
+      .reduce((sum, payment) => sum + payment.amount, 0);
+    const yearlyRevenue = allPayments
+      .filter(p => p.createdAt >= startOfYear)
+      .reduce((sum, payment) => sum + payment.amount, 0);
+
+    // Transaction counts
+    const totalTransactions = allPayments.length;
+    const monthlyTransactions = allPayments.filter(p => p.createdAt >= startOfMonth).length;
+    const lastMonthTransactions = allPayments.filter(
+      p => p.createdAt >= startOfLastMonth && p.createdAt < startOfMonth
+    ).length;
+
+    // Average order value
+    const avgOrderValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+    const monthlyAvgOrderValue = monthlyTransactions > 0 
+      ? monthlyRevenue / monthlyTransactions 
+      : 0;
+
+    // Refund stats
+    const refunds = await Payment.countDocuments({ status: 'refunded' });
+    const refundAmount = await Payment.aggregate([
+      { $match: { status: 'refunded' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    // Payment method distribution
+    const paymentMethods = await Payment.aggregate([
+      { $match: { status: 'completed' } },
+      { $group: { _id: '$paymentMethod', count: { $sum: 1 }, total: { $sum: '$amount' } } }
+    ]);
+
+    // Monthly revenue data for chart (last 12 months)
+    const monthlyRevenueData = await Payment.aggregate([
+      { $match: { status: 'completed', createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 12)) } } },
+      { $group: { 
+          _id: { 
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' } 
+          },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        } 
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } },
+      { $project: { 
+          month: '$_id.month',
+          year: '$_id.year',
+          total: 1,
+          count: 1,
+          _id: 0 
+        } 
+      }
+    ]);
+
+    // Format monthly data for frontend
+    const formattedMonthlyData = monthlyRevenueData.map(item => ({
+      month: `${item.year}-${item.month.toString().padStart(2, '0')}`,
+      revenue: item.total,
+      transactions: item.count
+    }));
+
+    // Calculate percentage changes
+    const revenueChange = lastMonthRevenue > 0 
+      ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue * 100).toFixed(1)
+      : '100';
+    const transactionChange = lastMonthTransactions > 0
+      ? ((monthlyTransactions - lastMonthTransactions) / lastMonthTransactions * 100).toFixed(1)
+      : '100';
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalRevenue,
+          monthlyRevenue,
+          yearlyRevenue,
+          totalTransactions,
+          monthlyTransactions,
+          avgOrderValue,
+          monthlyAvgOrderValue,
+          refunds,
+          refundAmount: refundAmount.length > 0 ? refundAmount[0].total : 0,
+          revenueChange,
+          transactionChange
+        },
+        paymentMethods,
+        monthlyTrends: formattedMonthlyData
+      }
+    });
+
+  } catch (error) {
+    console.error('Error getting payment stats:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get payment statistics' 
+    });
+  }
+};
+
+/**
+ * @desc    Get all transactions with filters and pagination
+ * @route   GET /api/payments/transactions
+ * @access  Private/Admin
+ */
+exports.getTransactions = async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      limit = 5, 
+      status, 
+      paymentMethod, 
+      dateFrom, 
+      dateTo,
+      search 
+    } = req.query;
+
+    // Build base query
+    const baseQuery = {};
+    if (status) baseQuery.status = status;
+    if (paymentMethod) baseQuery.paymentMethod = paymentMethod;
+    
+    // Date range filter
+    if (dateFrom || dateTo) {
+      baseQuery.createdAt = {};
+      if (dateFrom) baseQuery.createdAt.$gte = new Date(dateFrom);
+      if (dateTo) baseQuery.createdAt.$lte = new Date(dateTo);
+    }
+
+    // For search, we'll use aggregation pipeline
+    let aggregationPipeline = [];
+    
+    // Match stage for base query
+    aggregationPipeline.push({ $match: baseQuery });
+
+    // Lookup user details
+    aggregationPipeline.push({
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user'
+      }
+    });
+    aggregationPipeline.push({ $unwind: { path: '$user', preserveNullAndEmptyArrays: true } });
+
+    // Lookup booking and service details
+    aggregationPipeline.push({
+      $lookup: {
+        from: 'bookings',
+        localField: 'booking',
+        foreignField: '_id',
+        as: 'booking'
+      }
+    });
+    aggregationPipeline.push({ $unwind: { path: '$booking', preserveNullAndEmptyArrays: true } });
+    
+    aggregationPipeline.push({
+      $lookup: {
+        from: 'services',
+        localField: 'booking.service',
+        foreignField: '_id',
+        as: 'booking.service'
+      }
+    });
+    aggregationPipeline.push({ $unwind: { path: '$booking.service', preserveNullAndEmptyArrays: true } });
+
+    // Add search if provided
+    if (search) {
+      aggregationPipeline.push({
+        $match: {
+          $or: [
+            { transactionId: { $regex: search, $options: 'i' } },
+            { 'user.name': { $regex: search, $options: 'i' } },
+            { 'user.email': { $regex: search, $options: 'i' } },
+            { 'booking.service.name': { $regex: search, $options: 'i' } }
+          ]
+        }
+      });
+    }
+
+    // Clone pipeline for count
+    const countPipeline = [...aggregationPipeline];
+    countPipeline.push({ $count: 'total' });
+
+    // Add pagination and sorting
+    aggregationPipeline.push({ $sort: { createdAt: -1 } });
+    aggregationPipeline.push({ $skip: (page - 1) * limit });
+    aggregationPipeline.push({ $limit: parseInt(limit) });
+
+    // Project to clean up the output
+    aggregationPipeline.push({
+      $project: {
+        transactionId: 1,
+        amount: 1,
+        status: 1,
+        paymentMethod: 1,
+        createdAt: 1,
+        'user._id': 1,
+        'user.name': 1,
+        'user.email': 1,
+        'booking.service.name': 1
+      }
+    });
+
+    // Execute both pipelines
+    const [transactions, countResult] = await Promise.all([
+      Payment.aggregate(aggregationPipeline),
+      Payment.aggregate(countPipeline)
+    ]);
+
+    const total = countResult[0]?.total || 0;
+
+    res.json({
+      success: true,
+      data: transactions,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('Error getting transactions:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get transactions',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/**
+ * @desc    Get transaction by ID
+ * @route   GET /api/payments/transactions/:id
+ * @access  Private/Admin
+ */
+exports.getTransaction = async (req, res) => {
+  try {
+    const transaction = await Payment.findById(req.params.id)
+      .populate({
+        path: 'user',
+        select: 'name email phone'
+      })
+      .populate({
+        path: 'booking',
+        populate: [
+          {
+            path: 'service',
+            select: 'name basePrice estimatedDuration'
+          },
+          {
+            path: 'cleaner',
+            select: 'name phone'
+          }
+        ]
+      });
+
+    if (!transaction) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Transaction not found' 
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+
+  } catch (error) {
+    console.error('Error getting transaction:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get transaction' 
+    });
+  }
+};
+
+/**
+ * @desc    Get recent transactions (for dashboard widget)
+ * @route   GET /api/payments/transactions/recent
+ * @access  Private/Admin
+ */
+exports.getRecentTransactions = async (req, res) => {
+  try {
+    const transactions = await Payment.find({ status: 'completed' })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate({
+        path: 'user',
+        select: 'name'
+      })
+      .populate({
+        path: 'booking',
+        select: 'service',
+        populate: {
+          path: 'service',
+          select: 'name'
+        }
+      });
+
+    res.json({
+      success: true,
+      data: transactions
+    });
+
+  } catch (error) {
+    console.error('Error getting recent transactions:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get recent transactions' 
+    });
+  }
+};
+
+/**
+ * @desc    Get payment methods distribution
+ * @route   GET /api/payments/methods-distribution
+ * @access  Private/Admin
+ */
+exports.getPaymentMethodsDistribution = async (req, res) => {
+  try {
+    const distribution = await Payment.aggregate([
+      { 
+        $match: { 
+          status: 'completed',
+          createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 12)) }
+        } 
+      },
+      {
+        $group: {
+          _id: '$paymentMethod',
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$amount' }
+        }
+      },
+      {
+        $project: {
+          method: '$_id',
+          count: 1,
+          totalAmount: 1,
+          percentage: {
+            $round: [
+              {
+                $multiply: [
+                  { $divide: ['$count', { $sum: '$count' }] },
+                  100
+                ]
+              },
+              1
+            ]
+          },
+          _id: 0
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    res.json({
+      success: true,
+      data: distribution
+    });
+
+  } catch (error) {
+    console.error('Error getting payment methods distribution:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get payment methods distribution' 
+    });
+  }
+};
+
+/**
+ * @desc    Get revenue by period (day/week/month/year)
+ * @route   GET /api/payments/revenue-by-period
+ * @access  Private/Admin
+ */
+exports.getRevenueByPeriod = async (req, res) => {
+  try {
+    const { period = 'month' } = req.query;
+    let groupBy, dateFormat;
+
+    switch (period) {
+      case 'day':
+        groupBy = { 
+          year: { $year: '$createdAt' },
+          month: { $month: '$createdAt' },
+          day: { $dayOfMonth: '$createdAt' }
+        };
+        dateFormat = '%Y-%m-%d';
+        break;
+      case 'week':
+        groupBy = { 
+          year: { $year: '$createdAt' },
+          week: { $week: '$createdAt' }
+        };
+        dateFormat = '%Y-%U';
+        break;
+      case 'year':
+        groupBy = { year: { $year: '$createdAt' } };
+        dateFormat = '%Y';
+        break;
+      default: // month
+        groupBy = { 
+          year: { $year: '$createdAt' },
+          month: { $month: '$createdAt' } 
+        };
+        dateFormat = '%Y-%m';
+    }
+
+    const revenueData = await Payment.aggregate([
+      { 
+        $match: { 
+          status: 'completed',
+          createdAt: { $gte: new Date(new Date().setFullYear(new Date().getFullYear() - 1)) }
+        } 
+      },
+      {
+        $group: {
+          _id: groupBy,
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          date: {
+            $dateToString: {
+              format: dateFormat,
+              date: {
+                $dateFromParts: {
+                  year: '$_id.year',
+                  month: '$_id.month',
+                  day: '$_id.day'
+                }
+              }
+            }
+          },
+          total: 1,
+          count: 1,
+          _id: 0
+        }
+      },
+      { $sort: { date: 1 } }
+    ]);
+
+    res.json({
+      success: true,
+      data: revenueData
+    });
+
+  } catch (error) {
+    console.error('Error getting revenue by period:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get revenue data' 
+    });
   }
 };

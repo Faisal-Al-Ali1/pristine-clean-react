@@ -9,6 +9,8 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const adminBookingRoutes = require('./routes/adminBookingRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 const path = require("path");
@@ -35,6 +37,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/admin/bookings', adminBookingRoutes);
+app.use('/api/admin/dashboard', dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

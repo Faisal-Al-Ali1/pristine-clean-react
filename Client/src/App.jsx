@@ -14,6 +14,7 @@ import BookingPage from './components/booking/bookingPage';
 import PaymentSuccess from './components/booking/PaymentSuccess';
 import PaymentCancelled from './components/booking/PaymentCancelled';
 import PaymentError from './components/booking/PaymentError';
+import AdminDashboard from './components/admin/Dashboard';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/payment-success" element={<Layout><PaymentSuccess /></Layout>} />
         <Route path="/payment-cancelled" element={<Layout><PaymentCancelled /></Layout>} />
         <Route path="/payment-error" element={<Layout><PaymentError /></Layout>} />
+        <Route path="/admin-dash/*" element={<Layout><AdminDashboard /></Layout>} />
       </Routes>
     </Router>
     </AuthProvider>
