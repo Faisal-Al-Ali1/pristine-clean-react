@@ -15,7 +15,7 @@ const bookingSchema = new mongoose.Schema({
     type: Date, 
     required: true 
   },
-  endTime: Date, // Auto-calculated
+  endTime: Date, 
   frequency: {
     type: String,
     enum: ['once', 'weekly', 'biweekly', 'monthly'],
@@ -53,7 +53,7 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Payment' 
   },
-  additionalDetails: mongoose.Schema.Types.Mixed // For room count, pets, etc.
+  additionalDetails: mongoose.Schema.Types.Mixed 
 }, { timestamps: true });
 
 // Auto-calculate endTime before saving

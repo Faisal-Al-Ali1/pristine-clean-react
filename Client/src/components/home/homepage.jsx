@@ -30,7 +30,7 @@ const HomePage = () => {
       <HeroSection />
       <Services />
       <WhyUs />
-      <Pricing />
+      {/* <Pricing /> */}
       <TestimonialsSection />
 
       {showBackToTop && (

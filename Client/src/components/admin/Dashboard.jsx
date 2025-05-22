@@ -16,27 +16,21 @@ export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Handle window resize
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
     
-    // Check on load
     checkMobile();
     
-    // Set up listener
     window.addEventListener("resize", checkMobile);
     
-    // Clean up
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (isMobile && isSidebarOpen) {
-        // If clicked element is not within sidebar or toggle button
         const sidebar = document.getElementById("sidebar");
         const toggleButton = document.getElementById("sidebar-toggle");
         

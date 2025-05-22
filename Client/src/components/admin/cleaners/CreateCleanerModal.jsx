@@ -18,7 +18,6 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
     skills: [],
   });
 
-  // Initial form state
   const initialFormData = {
     name: '',
     email: '',
@@ -72,7 +71,6 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
     });
   };
 
-  // Reset form function
   const resetForm = () => {
     setFormData(initialFormData);
     setShowPassword(false);
@@ -99,26 +97,27 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md border border-gray-100">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md border border-gray-100 max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+        <div className="sticky top-0 p-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl z-10">
           <div>
-            <h3 className="text-xl font-bold text-gray-800">Create New Cleaner</h3>
-            <p className="text-sm text-gray-500 mt-1">Add a new cleaning professional to your team</p>
+            <h3 className="text-lg font-bold text-gray-800">Create New Cleaner</h3>
+            <p className="text-xs text-gray-500 mt-1">Add a new cleaning professional</p>
           </div>
           <button 
             onClick={onClose} 
             className="text-gray-500 hover:bg-gray-100 p-1 rounded-full transition-colors"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
+          {/* Name Field */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <User size={16} />
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <User size={14} />
               Full Name
             </label>
             <div className="relative">
@@ -127,18 +126,19 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 placeholder="John Doe"
                 required
               />
-              <User size={16} className="absolute left-3 top-3 text-gray-400" />
+              <User size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
             </div>
           </div>
 
+          {/* Email Field */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <Mail size={16} />
-              Email Address
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <Mail size={14} />
+              Email
             </label>
             <div className="relative">
               <input
@@ -146,17 +146,18 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 placeholder="cleaner@example.com"
                 required
               />
-              <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
+              <Mail size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
             </div>
           </div>
 
+          {/* Password Field */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <Lock size={16} />
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <Lock size={14} />
               Password
             </label>
             <div className="relative">
@@ -165,26 +166,27 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                className="w-full pl-8 pr-8 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 placeholder="At least 8 characters"
                 minLength={8}
                 required
               />
-              <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
+              <Lock size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
           </div>
 
+          {/* Phone Field */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <Phone size={16} />
-              Phone Number
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <Phone size={14} />
+              Phone
             </label>
             <div className="relative">
               <input
@@ -192,20 +194,21 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 placeholder="07"
                 required
               />
-              <Phone size={16} className="absolute left-3 top-3 text-gray-400" />
+              <Phone size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
             </div>
           </div>
 
+          {/* Address Fields */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <MapPin size={16} />
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <MapPin size={14} />
               Address
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <div className="relative">
                 <input
                   type="text"
@@ -213,9 +216,9 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                   value={formData.address.street}
                   onChange={handleInputChange}
                   placeholder="Street"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 />
-                <Home size={16} className="absolute left-3 top-3 text-gray-400" />
+                <Home size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
               </div>
               <div className="relative">
                 <input
@@ -224,23 +227,24 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                   value={formData.address.city}
                   onChange={handleInputChange}
                   placeholder="City"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-sm"
                 />
-                <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
+                <MapPin size={14} className="absolute left-2.5 top-2.5 text-gray-400" />
               </div>
             </div>
           </div>
 
+          {/* Skills Checkboxes */}
           <div className="space-y-1">
-            <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
-              <Star size={16} />
-              Cleaning Skills
+            <label className="flex items-center text-xs font-medium text-gray-700 gap-1">
+              <Star size={14} />
+              Skills
             </label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="grid grid-cols-2 gap-1.5">
               {skillsOptions.map((skill) => (
                 <label 
                   key={skill} 
-                  className={`flex items-center p-2 rounded-lg border cursor-pointer transition-colors ${
+                  className={`flex items-center p-1.5 rounded-md border cursor-pointer transition-colors text-xs ${
                     formData.skills.includes(skill) 
                       ? 'border-blue-500 bg-blue-50' 
                       : 'border-gray-200 hover:bg-gray-50'
@@ -253,41 +257,42 @@ const CreateCleanerModal = ({ visible, onClose, onSuccess }) => {
                     onChange={handleSkillsChange}
                     className="hidden"
                   />
-                  <div className={`w-5 h-5 rounded border flex items-center justify-center mr-2 ${
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center mr-1.5 ${
                     formData.skills.includes(skill) 
                       ? 'bg-blue-500 border-blue-500' 
                       : 'bg-white border-gray-300'
                   }`}>
-                    {formData.skills.includes(skill) && <Check size={14} className="text-white" />}
+                    {formData.skills.includes(skill) && <Check size={12} className="text-white" />}
                   </div>
-                  <span className="text-sm capitalize">{skill.replace('_', ' ')}</span>
+                  <span className="capitalize">{skill.replace(/_/g, ' ')}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-6">
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-white pb-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 bg-white text-gray-700 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 font-medium"
+              className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 text-sm font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed font-medium shadow-sm shadow-blue-100 flex items-center"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed text-sm font-medium flex items-center"
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Creating...
                 </>
-              ) : 'Create Cleaner'}
+              ) : 'Create'}
             </button>
           </div>
         </form>

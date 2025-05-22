@@ -14,6 +14,30 @@ function AssignCleanerModal({
 }) {
   if (!visible) return null;
 
+  const renderCleanerOption = (cleaner) => {
+    const skills = cleaner.cleanerProfile?.skills || [];
+    return (
+      <div className="py-2">
+        <div className="font-medium text-gray-800">{cleaner.name}</div>
+        {skills.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {skills.map((skill, index) => (
+              <span
+                key={index}
+                className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
+        {skills.length === 0 && (
+          <span className="text-xs text-gray-400 italic">No skills specified</span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-100">
@@ -90,7 +114,7 @@ function AssignCleanerModal({
                 <option value="">Select a cleaner</option>
                 {cleaners.map((cleaner) => (
                   <option key={cleaner._id} value={cleaner._id}>
-                    {cleaner.name} • {cleaner.cleanerProfile?.skills?.join(', ') || 'No skills specified'}
+                    {cleaner.name}  
                   </option>
                 ))}
               </select>
@@ -100,6 +124,39 @@ function AssignCleanerModal({
               <ChevronDown className="absolute right-3 top-3.5 text-gray-400" size={16} />
             </div>
           </div>
+
+          {/* Display selected cleaner details with skills as tags */}
+          {selectedCleaner && (
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <User size={16} className="text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-blue-800">Selected Cleaner</h4>
+                  <p className="text-sm text-blue-600 mt-1">
+                    {cleaners.find((c) => c._id === selectedCleaner)?.name || 'Selected cleaner'}
+                  </p>
+                  {(() => {
+                    const selectedCleanerData = cleaners.find((c) => c._id === selectedCleaner);
+                    const skills = selectedCleanerData?.cleanerProfile?.skills || [];
+                    return skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {skills.map((skill, index) => (
+                          <span
+                            key={index}
+                            className="inline-block px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded-full font-medium"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-1">
             <label className="flex items-center text-sm font-medium text-gray-700 gap-2">
@@ -113,24 +170,6 @@ function AssignCleanerModal({
               onChange={(e) => onChangeNotes(e.target.value)}
             />
           </div>
-
-          {selectedCleaner && (
-            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <User size={16} className="text-blue-600" />
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-blue-800">Cleaner Availability</h4>
-                <p className="text-sm text-blue-600 mt-1">
-                  {
-                    cleaners.find((c) => c._id === selectedCleaner)?.name 
-                    || 'Selected cleaner'
-                  }{' '}
-                  is available for this booking
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Modal Footer */}

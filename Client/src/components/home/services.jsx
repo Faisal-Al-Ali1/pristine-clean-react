@@ -62,8 +62,8 @@ const Services = () => {
           <h2 className="text-4xl font-bold text-gray-800">Our Cleaning Services</h2>
         </div>
         <div className="mt-6 md:mt-0 bg-gray-900 text-white rounded-lg p-5 relative">
-          <span className="text-4xl font-bold">+341</span>
-          <div className="text-sm mt-1">Project Finished</div>
+          <span className="text-4xl font-bold">+100</span>
+          <div className="text-sm mt-1">services Completed</div>
           <span className="absolute top-3 right-3 text-blue-400 text-lg">✦</span>
         </div>
       </div>

@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 exports.isAuthenticated = (req, res, next) => {
-  // 1) Retrieve the token from the "token" cookie
   const token = req.cookies.token;
 
   if (!token) {
@@ -10,9 +9,7 @@ exports.isAuthenticated = (req, res, next) => {
   }
 
   try {
-    // 2) Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // 3) Attach the decoded payload to req.user
     req.user = decoded;
     next();
   } catch (error) {

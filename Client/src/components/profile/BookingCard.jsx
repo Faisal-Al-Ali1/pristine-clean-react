@@ -1,24 +1,24 @@
 import React from 'react';
 import { toast } from 'sonner';
 
-const BookingCard = ({ 
-  booking, 
-  isUpcoming = false, 
-  onCancel, 
-  onEdit, 
-  onReview, 
-  hasReview = false 
+const BookingCard = ({
+  booking,
+  isUpcoming = false,
+  onCancel,
+  onEdit,
+  onReview,
+  hasReview = false
 }) => {
 
   // Simplified date formatting - display exactly as stored in DB
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     };
     return date.toLocaleDateString('en-US', options);
   };
@@ -69,8 +69,8 @@ const BookingCard = ({
       pending: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Pending' }
     };
 
-    const config = statusConfig[booking.status?.toLowerCase()] || 
-                 { bg: 'bg-gray-100', text: 'text-gray-800', label: booking.status || 'Unknown' };
+    const config = statusConfig[booking.status?.toLowerCase()] ||
+      { bg: 'bg-gray-100', text: 'text-gray-800', label: booking.status || 'Unknown' };
 
     return (
       <span className={`px-2 py-1 text-xs rounded-full ${config.bg} ${config.text}`}>
@@ -91,28 +91,32 @@ const BookingCard = ({
                 </h3>
                 <BookingStatus />
               </div>
-              
+
               <p className="text-gray-600 mb-1">
                 <span className="font-medium">Date:</span> {formatDate(booking.date)}
               </p>
-              
+
               <p className="text-gray-600 mb-1">
                 <span className="font-medium">Time:</span> {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
               </p>
-              
+
               {booking.location && (
                 <p className="text-gray-600 mb-1">
                   <span className="font-medium">Location:</span> {booking.location}
                 </p>
               )}
-              
+
+              <p className="text-gray-600 mb-1">
+                <span className="font-medium">Assigned Cleaner:</span> {booking.assignedCleaner?.name || 'N/A'}
+              </p>
+
               <div className="mt-2">
                 <p className="text-gray-700 font-medium">
                   {booking.price?.toFixed(2)} {booking.service?.currency || 'JOD'}
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-4 sm:mt-0 flex sm:flex-col gap-2 justify-end">
               {isUpcoming && isBookingUpcoming() && (
                 <>
@@ -130,7 +134,7 @@ const BookingCard = ({
                   </button>
                 </>
               )}
-              
+
               {!isUpcoming && !hasReview && booking.status === 'completed' && (
                 <button
                   onClick={handleReviewClick}
@@ -139,7 +143,7 @@ const BookingCard = ({
                   Leave Review
                 </button>
               )}
-              
+
               {!isUpcoming && hasReview && (
                 <div className="bg-gray-100 rounded-lg px-3 py-2 text-sm text-gray-800">
                   Review Submitted

@@ -14,7 +14,6 @@ const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if user is already logged in on component mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -60,22 +59,16 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // 1) Login the user
       await login({ email, password });
       
-      // 2) Get user details including role
       const userData = await getMe();
       
-      // 3) Update user state in AuthContext
       setUser(userData.user);
       
-      // 4) Show success message with longer duration
       toast.success('Logged in successfully!', { duration: 3000 });
       
-      // 5) Redirect based on role with delay
       redirectBasedOnRole(userData.user.role);
     } catch (error) {
-      // 6) Handle errors with longer duration
       const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
       toast.error(errorMessage, { duration: 4000 });
     } finally {
@@ -121,16 +114,16 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6" id="login-form">
-            {/* Google Button (optional) */}
+            {/* Google Button (optional)
             <button
               type="button"
               className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
             >
               <img src="/images/google.png" alt="Google Icon" className="w-5 h-5 mr-2" />
               Continue with Google
-            </button>
+            </button> */}
 
-            {/* Divider */}
+            {/* Divider
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
@@ -138,7 +131,7 @@ const Login = () => {
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">Or</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Email */}
             <div>
@@ -212,11 +205,11 @@ const Login = () => {
             .
           </p>
 
-          <p className="mt-4 text-sm text-center">
+          {/* <p className="mt-4 text-sm text-center">
             <Link to="#" className="text-blue-500 hover:underline">
               Forgot password?
             </Link>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

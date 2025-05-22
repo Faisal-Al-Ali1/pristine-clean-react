@@ -39,7 +39,6 @@ const userSchema = new Schema(
       enum: ['customer', 'cleaner', 'admin'],
       default: 'customer'
     },
-    // Cleaner-specific fields (only populated when role='cleaner')
     cleanerProfile: {
       skills: [{
         type: String,
@@ -56,7 +55,6 @@ const userSchema = new Schema(
         default: true
       }
     },
-    // Optional: Link to Subscription if needed
     subscription: {
       type: Schema.Types.ObjectId,
       ref: 'Subscription',

@@ -16,6 +16,7 @@ import PaymentCancelled from './components/booking/PaymentCancelled';
 import PaymentError from './components/booking/PaymentError';
 import AdminDashboard from './components/admin/Dashboard';
 import CleanerPage from './components/cleaner/CleanerPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -30,12 +31,15 @@ function App() {
         <Route path="/signup" element={<Layout><Signup /></Layout>} />
         <Route path="/aboutUs" element={<Layout><AboutUs /></Layout>} />
         <Route path="/contactUs" element={<Layout><ContactUs /></Layout>} />
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
         <Route path="/userProfile" element={<Layout><UserProfile /></Layout>} />
         <Route path="/bookingPage" element={<Layout><BookingPage /></Layout>} />
+        <Route path="/admin-dash/*" element={<Layout><AdminDashboard /></Layout>} />
+        </Route>
         <Route path="/payment-success" element={<Layout><PaymentSuccess /></Layout>} />
         <Route path="/payment-cancelled" element={<Layout><PaymentCancelled /></Layout>} />
         <Route path="/payment-error" element={<Layout><PaymentError /></Layout>} />
-        <Route path="/admin-dash/*" element={<Layout><AdminDashboard /></Layout>} />
         <Route path="/cleaner-page" element={<Layout><CleanerPage /></Layout>} />
       </Routes>
     </Router>

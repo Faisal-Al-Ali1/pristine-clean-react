@@ -74,7 +74,6 @@ const UserProfile = () => {
     try {
       setBookings(prev => ({...prev, loading: true}));
       const { data } = await getUserBookings();
-      
       if (!Array.isArray(data)) {
         throw new Error('Invalid bookings data format');
       }

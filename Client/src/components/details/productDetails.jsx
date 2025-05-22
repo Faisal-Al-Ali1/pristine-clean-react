@@ -30,16 +30,15 @@ const ProductDetails = () => {
     }
   ];
 
-  // Fetch the service by ID
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const data = await getServiceById(id); // Fetch the service
-        setService(data); // Set the fetched service in state
-        setLoading(false); // Set loading to false
+        const data = await getServiceById(id); 
+        setService(data); 
+        setLoading(false); 
       } catch (err) {
-        setError(err.message); // Set error message
-        setLoading(false); // Set loading to false
+        setError(err.message); 
+        setLoading(false); 
       }
     };
 

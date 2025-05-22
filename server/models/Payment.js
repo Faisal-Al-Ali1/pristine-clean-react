@@ -30,8 +30,8 @@ const paymentSchema = new mongoose.Schema({
     enum: ['pending', 'completed', 'failed', 'refunded'],
     default: 'pending'
   },
-  transactionId: String, // PayPal transaction ID
-  paymentDetails: mongoose.Schema.Types.Mixed // PayPal API response
+  transactionId: String, 
+  paymentDetails: mongoose.Schema.Types.Mixed 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Payment', paymentSchema);

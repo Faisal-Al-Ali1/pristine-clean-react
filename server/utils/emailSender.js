@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'Gmail', // or your email provider
+  service: 'Gmail', 
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 exports.sendContactNotification = async ({ name, email, subject, message }) => {
   const mailOptions = {
     from: `"Contact Form" <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL, // Your support email
+    to: process.env.ADMIN_EMAIL, 
     subject: `New Contact Submission: ${subject || 'General Inquiry'}`,
     html: `
       <h2>New Contact Form Submission</h2>

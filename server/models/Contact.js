@@ -13,12 +13,10 @@ const contactSchema = new Schema(
       required: true,
       lowercase: true
     },
-    // Example: subject or topic of the inquiry
     subject: {
       type: String,
       default: ''
     },
-    // The user's message
     message: {
       type: String,
       required: true

@@ -5,14 +5,14 @@ const { isAuthenticated, isAdmin } = require('../middlewares/authMiddleware');
 
 
 // Payment routes
-router.post('/', isAuthenticated, createPayment); // Handle all payment methods
+router.post('/', isAuthenticated, createPayment); 
 
 router.get('/paypal/success', paypalSuccess); 
 router.get('/paypal/cancel', paypalCancel); 
 
 // Admin Routes
-router.put('/:id/verify-cash', isAuthenticated, isAdmin, verifyCashPayment); // Admin-only 
-router.post('/:id/refund', isAuthenticated, isAdmin, processRefund); // Admin-only 
+router.put('/:id/verify-cash', isAuthenticated, isAdmin, verifyCashPayment);  
+router.post('/:id/refund', isAuthenticated, isAdmin, processRefund); 
 router.get('/stats', isAuthenticated, isAdmin, getPaymentStats);
 router.get('/transactions', isAuthenticated, isAdmin, getTransactions);
 router.get('/transactions/recent', isAuthenticated, isAdmin, getRecentTransactions);

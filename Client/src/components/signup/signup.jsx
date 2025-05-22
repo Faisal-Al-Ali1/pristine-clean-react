@@ -35,7 +35,6 @@ const Signup = () => {
     setSignUpMessage('');
     setIsSuccessMessage(false);
 
-    // 1) Basic client-side checks
     if (password !== confirmPassword) {
       setSignUpMessage('Passwords do not match.');
       return;
@@ -46,24 +45,19 @@ const Signup = () => {
     }
 
     try {
-      // 2) Use the shared `register` function
       const data = await register({ name, email, password });
 
-      // 3) Check response status or data
       setSignUpMessage(data.message || 'User registered successfully');
       setIsSuccessMessage(true);
 
-      // 4) Update AuthContext with the returned user info
       if (data.user) {
         setUser(data.user);
       }
 
-      // 5) Wait 3 seconds and redirect to '/'
       setTimeout(() => {
         navigate('/');
       }, 2000);
     } catch (error) {
-      // 6) Handle errors (e.g., user already exists, validation fails, etc.)
       if (error.response && error.response.data && error.response.data.message) {
         setSignUpMessage(error.response.data.message);
       } else {
@@ -110,16 +104,16 @@ const Signup = () => {
           )}
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {/* Google Button (optional) */}
+            {/* Google Button (optional)
             <button
               type="button"
               className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
             >
               <img src="/images/google.png" alt="Google Icon" className="w-5 h-5 mr-2" />
               Continue with Google
-            </button>
+            </button> */}
 
-            {/* Divider */}
+            {/* Divider
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
@@ -127,7 +121,7 @@ const Signup = () => {
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">Or</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Name */}
             <div>

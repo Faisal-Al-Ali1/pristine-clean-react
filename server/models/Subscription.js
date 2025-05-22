@@ -6,7 +6,7 @@ const subscriptionSchema = new Schema(
   {
     name: {
       type: String,
-      enum: ['monthly', 'yearly'], // or add more subscription tiers
+      enum: ['monthly', 'yearly'], 
       required: true
     },
     price: {
@@ -29,7 +29,7 @@ const subscriptionSchema = new Schema(
     ],
     billingCycleInDays: {
       type: Number,
-      default: 30 // for monthly
+      default: 30 
     }
   },
   { timestamps: true }

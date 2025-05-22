@@ -10,9 +10,7 @@ const isWithinBusinessHours = (date) => {
   return hours >= 8 && hours < 20; // 8AM-7:59PM
 };
 
-/**
- * Atomic slot availability check with transaction support
- */
+
 const isSlotAvailable = async (startTime, durationHours, excludeBookingId = null, session = null) => {
   const endTime = new Date(startTime.getTime() + durationHours * 60 * 60 * 1000);
 

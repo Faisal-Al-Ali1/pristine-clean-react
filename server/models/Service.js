@@ -18,11 +18,11 @@ const serviceSchema = new Schema(
       required: true
     },
     estimatedDuration: {
-      type: Number, // e.g., in hours
+      type: Number, 
       default: 2
     },
     imageUrl: {
-      type: String, // This will store the relative path
+      type: String, 
       required: true
     },
     detailedDescription: {
@@ -39,7 +39,7 @@ const serviceSchema = new Schema(
           type: String,
           required: true
         },
-        _id: false // Disable _id for subdocuments
+        _id: false 
       }
     ],
     averageRating: {
@@ -59,7 +59,7 @@ const serviceSchema = new Schema(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true } // Include virtuals in the response
+    toJSON: { virtuals: true } 
   }
 );
 
